@@ -9,8 +9,43 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
+
+    @Environment(\.assistant)
+    private var assistant
+
+    @Environment(\.modelContext)
+    private var modelContext
+
     @Query private var items: [Item]
+
+    @State
+    private var prompt: String = ""
+
+    @State
+    private var demandTask: Task<Void, Error>?
+
+    @State
+    private var recorder = SpeechRecorderManager()
+
+    enum LoadingPhase {
+
+        case idle
+
+        case loading
+
+        case success
+
+        case failure
+    }
+
+    @State
+    private var demandLoadingState: LoadingPhase = .idle
+
+    @State
+    private var toggleRecordingTask: Task<Void, Error>?
+
+    @State
+    private var toggleRecordingLoadingState: LoadingPhase = .idle
 
     var body: some View {
         NavigationSplitView {
@@ -24,6 +59,50 @@ struct ContentView: View {
                 }
                 .onDelete(perform: deleteItems)
             }
+            .safeAreaBar(edge: .bottom) {
+                HStack {
+                    TextField("Formulez votre demande", text: $prompt)
+
+                    if prompt.isEmpty {
+                        Button {
+                            toggleRecordingTask = Task { try await recorder.toggle() }
+                        } label: {
+                            Image(systemName: recorder.isRecording ? "stop.circle.fill" : "microphone.circle.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundStyle(.black)
+                        }
+                        .disabled(toggleRecordingLoadingState == .loading)
+                        .task(id: toggleRecordingTask) {
+                            guard let toggleRecordingTask else { return }
+
+                            toggleRecordingLoadingState = .loading
+
+                            do {
+                                try await toggleRecordingTask.value
+                                print("Toggle Recording Success")
+                                toggleRecordingLoadingState = .success
+                            } catch {
+                                print("Toggle Recording Failure \(error)")
+                                toggleRecordingLoadingState = .failure
+                            }
+                        }
+                    } else {
+                        Button {
+                            demandTask = Task { try await assistant.send(demand: prompt) }
+                        } label: {
+                            Image(systemName: "arrow.up.circle.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundStyle(.blue)
+                        }
+                    }
+                }
+                .padding(12.0)
+                .frame(height: 48.0)
+                .glassEffect(.regular, in: .capsule)
+                .padding()
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()
@@ -32,6 +111,21 @@ struct ContentView: View {
                     Button(action: addItem) {
                         Label("Add Item", systemImage: "plus")
                     }
+                }
+            }
+            .task(id: demandTask) {
+                guard let demandTask else { return }
+
+                print("Start Demand")
+                demandLoadingState = .loading
+
+                switch await withResultOperation({ try await demandTask.value }) {
+                case .success:
+                    print("Success Demand")
+                    demandLoadingState = .success
+                case .failure(let error):
+                    print("Failure Demand \(error)")
+                    demandLoadingState = .failure
                 }
             }
         } detail: {

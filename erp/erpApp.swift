@@ -10,23 +10,18 @@ import SwiftData
 
 @main
 struct erpApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+    @State
+    private var db = SwiftDataManager(model: try! ModelContainer(for: Schema([]), configurations: ModelConfiguration(schema: Schema([]), isStoredInMemoryOnly: true)))
+
+    @State
+    private var assistant = AssistantManager(tools: [CreateProductTool()])
 
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(db)
+                .environment(\.assistant, assistant)
         }
-        .modelContainer(sharedModelContainer)
     }
 }
