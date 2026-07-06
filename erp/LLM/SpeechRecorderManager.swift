@@ -97,7 +97,7 @@ final class SpeechRecorderManager: Sendable {
 
         // Replay the record for analysis
         for buffer in audioBuffer {
-            var buffer = {
+            let buffer = {
                 if buffer.format != bestTranscriberFormat {
                     let converter = AVAudioConverter(from: buffer.format, to: bestTranscriberFormat)
                     let ratio = bestTranscriberFormat.sampleRate / buffer.format.sampleRate

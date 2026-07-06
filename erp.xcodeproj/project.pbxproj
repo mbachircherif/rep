@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		799EDB9C2FFBC74C003813BC /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 799EDB9B2FFBC74C003813BC /* Algorithms */; };
+		799EDB9F2FFBC799003813BC /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 799EDB9E2FFBC799003813BC /* AsyncAlgorithms */; };
+		799EDBA12FFBC799003813BC /* AsyncStreaming in Frameworks */ = {isa = PBXBuildFile; productRef = 799EDBA02FFBC799003813BC /* AsyncStreaming */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		799EDB432FF90785003813BC /* erp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = erp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +42,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				799EDB9C2FFBC74C003813BC /* Algorithms in Frameworks */,
+				799EDB9F2FFBC799003813BC /* AsyncAlgorithms in Frameworks */,
+				799EDBA12FFBC799003813BC /* AsyncStreaming in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +87,9 @@
 			);
 			name = erp;
 			packageProductDependencies = (
+				799EDB9B2FFBC74C003813BC /* Algorithms */,
+				799EDB9E2FFBC799003813BC /* AsyncAlgorithms */,
+				799EDBA02FFBC799003813BC /* AsyncStreaming */,
 			);
 			productName = erp;
 			productReference = 799EDB432FF90785003813BC /* erp.app */;
@@ -108,6 +120,8 @@
 			mainGroup = 799EDB3A2FF90785003813BC;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				799EDB9A2FFBC74C003813BC /* XCRemoteSwiftPackageReference "swift-algorithms" */,
+				799EDB9D2FFBC799003813BC /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 799EDB442FF90785003813BC /* Products */;
@@ -288,6 +302,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -321,6 +336,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -349,6 +365,43 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		799EDB9A2FFBC74C003813BC /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-algorithms.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.1;
+			};
+		};
+		799EDB9D2FFBC799003813BC /* XCRemoteSwiftPackageReference "swift-async-algorithms" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-async-algorithms.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.5;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		799EDB9B2FFBC74C003813BC /* Algorithms */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 799EDB9A2FFBC74C003813BC /* XCRemoteSwiftPackageReference "swift-algorithms" */;
+			productName = Algorithms;
+		};
+		799EDB9E2FFBC799003813BC /* AsyncAlgorithms */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 799EDB9D2FFBC799003813BC /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
+			productName = AsyncAlgorithms;
+		};
+		799EDBA02FFBC799003813BC /* AsyncStreaming */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 799EDB9D2FFBC799003813BC /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
+			productName = AsyncStreaming;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 799EDB3B2FF90785003813BC /* Project object */;
 }
