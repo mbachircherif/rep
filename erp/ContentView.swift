@@ -26,7 +26,7 @@ struct ContentView: View {
     private var prompt: String = ""
 
     @State
-    private var demandTask: TaskState<Void, Error> = .idle
+    private var demandTask: TaskSequencer<Void, Error> = .init(state: .waiting)
 
     @State
     private var recorder = SpeechRecorderManager()
@@ -124,20 +124,12 @@ struct ContentView: View {
                     .frame(height: 100.0)
                     .transition(.scale(scale: 0.5).combined(with: .opacity))
 
-                    switch demandTask {
-                    case let .loading(task):
+                    switch demandTask.state {
+                    case .running:
                         ProgressView()
-                            .task {
-                                switch await task.result {
-                                case .success:
-                                    demandTask = .success(task, ())
-                                case .failure(let error):
-                                    demandTask = .failure(task, error)
-                                }
-                            }
-                    case let .failure(task, _):
+                    case .failure:
                         Button {
-                            demandTask = .loading(task)
+                            // Retry
                         } label: {
                             Text("An error has occured during the operation\nTouch to retry.")
                                 .font(.system(size: 12.0))
@@ -182,7 +174,13 @@ struct ContentView: View {
                         }
                     } else {
                         Button {
-                            demandTask = .loading(Task { try await assistant.send(demand: prompt) })
+                            demandTask.run {
+                                do {
+                                    return .success(try await assistant.send(demand: prompt))
+                                } catch {
+                                    return .failure(error)
+                                }
+                            }
                         } label: {
                             Image(systemName: "arrow.up.circle.fill")
                                 .resizable()
