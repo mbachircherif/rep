@@ -9,14 +9,16 @@ import Foundation
 import SwiftData
 
 @Model
-final class Product {
+final class Product: Sendable {
 
-    var id: UUID
+    var id: UUID = UUID()
 
     var name: String
 
-    init(id: UUID, name: String) {
-        self.id = id
+    var price: Double
+
+    init(name: String, price: Double) {
         self.name = name
+        self.price = price
     }
 }

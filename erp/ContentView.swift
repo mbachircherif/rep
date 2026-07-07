@@ -10,19 +10,23 @@ import SwiftData
 
 struct ContentView: View {
 
-    @Environment(\.assistant)
+    @Environment(AssistantManager.self)
     private var assistant
 
     @Environment(\.modelContext)
     private var modelContext
 
-    @Query private var items: [Item]
+    @Environment(SwiftDataManager.self)
+    private var dataManager
+
+    @Query
+    private var products: [Product]
 
     @State
     private var prompt: String = ""
 
     @State
-    private var demandTask: Task<Void, Error>?
+    private var demandTask: TaskState<Void, Error> = .idle
 
     @State
     private var recorder = SpeechRecorderManager()
@@ -39,25 +43,114 @@ struct ContentView: View {
     }
 
     @State
-    private var demandLoadingState: LoadingPhase = .idle
-
-    @State
     private var toggleRecordingTask: Task<Void, Error>?
 
     @State
     private var toggleRecordingLoadingState: LoadingPhase = .idle
 
+    @State
+    private var historyChanges: [DataOperationAction] = []
+
     var body: some View {
         NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+            ScrollView(.vertical) {
+                LazyVStack {
+                    ForEach(historyChanges.indices, id: \.self) { index in
+                        let change = historyChanges[index]
+
+                        Group {
+                            switch change {
+                            case .delete(let model as Product):
+                                HStack {
+                                    ContainerRelativeShape()
+                                        .fill(.gray)
+                                        .aspectRatio(1, contentMode: .fit)
+
+                                    VStack {
+                                        Text(model.name)
+                                            .font(.system(size: 13.0))
+
+                                        Text(model.price, format: .number)
+                                            .font(.system(size: 13.0))
+                                    }
+
+                                    Spacer()
+                                }
+                                .padding()
+                                .background(.red.quinary, in: .containerRelative)
+                            case .insert(let model as Product):
+                                HStack {
+                                    ContainerRelativeShape()
+                                        .fill(.gray)
+                                        .aspectRatio(1, contentMode: .fit)
+
+                                    VStack {
+                                        Text(model.name)
+                                            .font(.system(size: 13.0))
+
+                                        Text(model.price, format: .number)
+                                            .font(.system(size: 13.0))
+                                    }
+
+                                    Spacer()
+                                }
+                                .padding()
+                                .background(.green.quinary, in: .containerRelative)
+                            case .update(let model as Product):
+                                HStack {
+                                    ContainerRelativeShape()
+                                        .fill(.gray)
+                                        .aspectRatio(1, contentMode: .fit)
+
+                                    VStack {
+                                        Text(model.name)
+                                            .font(.system(size: 13.0))
+
+                                        Text(model.price, format: .number)
+                                            .font(.system(size: 13.0))
+                                    }
+
+                                    Spacer()
+                                }
+                                .padding()
+                                .background(.orange.quinary, in: .containerRelative)
+                            default:
+                                Text("Unknown intructions")
+                                    .font(.system(size: 13.0))
+                            }
+                        }
+                        .overlay(.gray, in: .containerRelative.stroke())
+                    }
+                    .frame(height: 100.0)
+                    .transition(.scale(scale: 0.5).combined(with: .opacity))
+
+                    switch demandTask {
+                    case let .loading(task):
+                        ProgressView()
+                            .task {
+                                switch await task.result {
+                                case .success:
+                                    demandTask = .success(task, ())
+                                case .failure(let error):
+                                    demandTask = .failure(task, error)
+                                }
+                            }
+                    case let .failure(task, _):
+                        Button {
+                            demandTask = .loading(task)
+                        } label: {
+                            Text("An error has occured during the operation\nTouch to retry.")
+                                .font(.system(size: 12.0))
+                                .foregroundStyle(.red)
+                                .padding(8.0)
+                                .background(.red.quinary, in: .containerRelative)
+                                .overlay(.red, in: .containerRelative)
+                        }
+                    default:
+                        EmptyView()
                     }
                 }
-                .onDelete(perform: deleteItems)
+                .padding()
             }
             .safeAreaBar(edge: .bottom) {
                 HStack {
@@ -89,7 +182,7 @@ struct ContentView: View {
                         }
                     } else {
                         Button {
-                            demandTask = Task { try await assistant.send(demand: prompt) }
+                            demandTask = .loading(Task { try await assistant.send(demand: prompt) })
                         } label: {
                             Image(systemName: "arrow.up.circle.fill")
                                 .resizable()
@@ -113,19 +206,9 @@ struct ContentView: View {
                     }
                 }
             }
-            .task(id: demandTask) {
-                guard let demandTask else { return }
-
-                print("Start Demand")
-                demandLoadingState = .loading
-
-                switch await withResultOperation({ try await demandTask.value }) {
-                case .success:
-                    print("Success Demand")
-                    demandLoadingState = .success
-                case .failure(let error):
-                    print("Failure Demand \(error)")
-                    demandLoadingState = .failure
+            .onTransactionChanges { action in
+                withAnimation(.smooth) {
+                    historyChanges.append(action)
                 }
             }
         } detail: {
@@ -134,17 +217,11 @@ struct ContentView: View {
     }
 
     private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
+        Task {
+            let newItem = Product(name: "random_name", price: 10.0)
+            await dataManager.insert(newItem)
+            await dataManager.unsafeSave()
+            await dataManager.sync()
         }
     }
 }

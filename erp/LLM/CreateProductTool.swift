@@ -9,6 +9,8 @@ import FoundationModels
 
 struct CreateProductTool: Tool {
 
+    let databaseManager: SwiftDataManager
+
     let name = "createProduct"
 
     let description = "Add a new product to the inventory."
@@ -23,6 +25,10 @@ struct CreateProductTool: Tool {
     }
 
     func call(arguments: Arguments) async throws -> String {
-        "Created product \(arguments.name) at \(arguments.price)€."
+        await databaseManager.insert(Product(name: arguments.name, price: arguments.price))
+        await databaseManager.unsafeSave()
+        await databaseManager.sync()
+
+        return "Created product \(arguments.name) at \(arguments.price)€."
     }
 }

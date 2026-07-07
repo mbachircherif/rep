@@ -17,7 +17,7 @@ final class AsyncSharedStream<T> where T : Sendable {
     let shared: any AsyncSequence<T, Never> & Sendable
 
     init() {
-        let (stream, continuation) = AsyncStream.makeStream(of: T.self)
+        let (stream, continuation) = AsyncStream.makeStream(of: T.self, bufferingPolicy: .unbounded)
 
         self.continuation = continuation
         self.shared = stream.share(bufferingPolicy: .unbounded)

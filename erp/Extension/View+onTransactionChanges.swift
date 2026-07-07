@@ -9,18 +9,29 @@ import Combine
 import SwiftData
 import SwiftUI
 
-struct TransactionObserverViewMofidier<Model>: ViewModifier where Model : PersistentModel {
+struct TransactionObserverViewMofidier: ViewModifier {
 
     @Environment(SwiftDataManager.self)
     private var database
 
-    let action: (HistoryChange) -> Void
+    let action: (DataOperationAction) -> Void
 
     func body(content: Content) -> some View {
         content
             .task(priority: .background) {
-                for await change in await database.changes(for: Model.self) {
-                    action(change)
+                for await change in await database.changes() {
+                    let model = await database.fetch(for: change.changedPersistentIdentifier)
+
+                    switch change {
+                    case .delete:
+                        action(.delete(model))
+                    case .insert:
+                        action(.insert(model))
+                    case .update:
+                        action(.update(model))
+                    @unknown default:
+                        break
+                    }
                 }
             }
     }
@@ -28,7 +39,7 @@ struct TransactionObserverViewMofidier<Model>: ViewModifier where Model : Persis
 
 extension View {
 
-    func onTransactionChanges<Model>(perform action: @escaping (HistoryChange) -> Void) -> some View where Model : PersistentModel {
-        modifier(TransactionObserverViewMofidier<Model>(action: action))
+    func onTransactionChanges(perform action: @escaping (DataOperationAction) -> Void) -> some View {
+        modifier(TransactionObserverViewMofidier(action: action))
     }
 }

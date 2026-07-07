@@ -26,5 +26,17 @@ final class AssistantManager: Sendable {
 
     func send(demand: String) async throws {
         try await session.respond(to: demand)
+        for entry in session.transcript {
+            switch entry {
+            case .toolCalls(let calls):
+                for call in calls {
+                    print("Model called: \(call.toolName), args: \(call.arguments)")
+                }
+            case .toolOutput(let output):
+                print("Tool returned: \(output)")
+            default:
+                break
+            }
+        }
     }
 }

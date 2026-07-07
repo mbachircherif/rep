@@ -22,15 +22,32 @@ final class SwiftDataManager: Sendable {
 
     private let context: ModelContext
 
-    private var streams: [AnyMetatype : AsyncSharedStream<HistoryChange>] = [:]
+    private let stream = AsyncSharedStream<HistoryChange>()
 
     private var lastToken: DefaultHistoryToken?
 
-    init(container: ModelContainer, observedModels: [any PersistentModel.Type]) {
-        self.context = ModelContext(container)
+    init(container: ModelContainer) {
+        let context = ModelContext(container)
+
+        context.author = "SwiftDataManager"
+        context.autosaveEnabled = false
+
+        self.context = context
     }
 
-    func browseHistory() async {
+    func insert<T>(_ model: T) where T : PersistentModel {
+        context.insert(model)
+    }
+
+    func save() throws {
+        try context.save()
+    }
+
+    func unsafeSave() {
+        try? context.save()
+    }
+
+    func sync() {
 
         let descriptor: HistoryDescriptor<DefaultHistoryTransaction>
 
@@ -45,16 +62,7 @@ final class SwiftDataManager: Sendable {
 
             for transaction in history {
                 for change in transaction.changes {
-                    switch change {
-                    case .insert(let insert):
-                        notifyInsertChange(insert)
-                    case .update(let update):
-                        notifyUpdateChange(update)
-                    case .delete(let delete):
-                        notifyDeleteChange(delete)
-                    @unknown default:
-                        break
-                    }
+                    stream.send(change)
                 }
             }
 
@@ -66,25 +74,11 @@ final class SwiftDataManager: Sendable {
         }
     }
 
-    private func notifyInsertChange<Model>(_ existantial: some HistoryInsert<Model>) {
-        if let stream = streams[AnyMetatype(Model.self)] {
-            stream.send(.insert(existantial))
-        }
+    func fetch(for id: PersistentIdentifier) -> any PersistentModel {
+        context.model(for: id)
     }
 
-    private func notifyUpdateChange<Model>(_ existantial: some HistoryUpdate<Model>) {
-        if let stream = streams[AnyMetatype(Model.self)] {
-            stream.send(.update(existantial))
-        }
-    }
-
-    private func notifyDeleteChange<Model>(_ existantial: some HistoryDelete<Model>) {
-        if let stream = streams[AnyMetatype(Model.self)] {
-            stream.send(.delete(existantial))
-        }
-    }
-
-    func changes<Model: PersistentModel>(for model: Model.Type) -> any SendableAsyncSequence<HistoryChange> {
-        streams[AnyMetatype(model), default: AsyncSharedStream()].shared
+    func changes() -> any SendableAsyncSequence<HistoryChange> {
+        stream.shared
     }
 }
