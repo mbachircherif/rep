@@ -13,7 +13,7 @@ import Foundation
 /// superseded operations are expected to exit early, and their results
 /// are discarded — only the latest operation reports through `state`.
 @MainActor @Observable
-final class TaskSequencer<Success, Failure> where Failure : Error {
+final class LoadingTask<Success, Failure> where Failure : Error {
 
     private var currentTask: Task<Void, Never>?
 

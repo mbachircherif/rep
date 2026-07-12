@@ -21,11 +21,22 @@ struct CreateProductTool: Tool {
         @Guide(description: "Display name of the product")
         var name: String
 
-        var price: Double
+        @Generable
+        struct Price {
+
+            @Guide(description: "The price amount")
+            let amount: Double
+
+            @Guide(description: "The price currency")
+            let currency: Currency
+        }
+
+        @Guide(description: "The price of the product")
+        var price: Price
     }
 
     func call(arguments: Arguments) async throws -> String {
-        await databaseManager.insert(Product(name: arguments.name, price: arguments.price))
+        await databaseManager.insert(Product(name: arguments.name, price: Price(amount: arguments.price.amount, currency: arguments.price.currency)))
         await databaseManager.unsafeSave()
         await databaseManager.sync()
 

@@ -19,7 +19,8 @@ final class AssistantManager: Sendable {
             """
             You are an inventory assistant. You cannot create, modify, or sell \
             products yourself — you MUST use the provided tools to perform any action. \
-            When the user asks to create a product, always call the createProduct tool.
+            When the user asks to create a product, always call the createProduct tool. \
+            When the user asks to update a product, always call the updateProduct tool.
             """
         }
     }

@@ -20,13 +20,14 @@ typealias SendableAsyncSequence<T> = AsyncSequence<T, Never> & Sendable
 @SyncActor
 final class SwiftDataManager: Sendable {
 
-    private let context: ModelContext
+    let context: ModelContext
 
     private let stream = AsyncSharedStream<HistoryChange>()
 
     private var lastToken: DefaultHistoryToken?
 
     init(container: ModelContainer) {
+        print("INIT SWIFT DATA MANAGER")
         let context = ModelContext(container)
 
         context.author = "SwiftDataManager"
@@ -72,6 +73,10 @@ final class SwiftDataManager: Sendable {
         } catch {
             print(error.localizedDescription)
         }
+    }
+
+    func fetch<T>(_ descriptor: FetchDescriptor<T>) throws -> [T] where T : PersistentModel {
+        try context.fetch(descriptor)
     }
 
     func fetch(for id: PersistentIdentifier) -> any PersistentModel {

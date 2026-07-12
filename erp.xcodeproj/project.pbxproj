@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		791DED953003AEA4009A871D /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 791DED943003AEA4009A871D /* OrderedCollections */; };
 		799EDB9C2FFBC74C003813BC /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 799EDB9B2FFBC74C003813BC /* Algorithms */; };
 		799EDB9F2FFBC799003813BC /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 799EDB9E2FFBC799003813BC /* AsyncAlgorithms */; };
 		799EDBA12FFBC799003813BC /* AsyncStreaming in Frameworks */ = {isa = PBXBuildFile; productRef = 799EDBA02FFBC799003813BC /* AsyncStreaming */; };
@@ -44,6 +45,7 @@
 			files = (
 				799EDB9C2FFBC74C003813BC /* Algorithms in Frameworks */,
 				799EDB9F2FFBC799003813BC /* AsyncAlgorithms in Frameworks */,
+				791DED953003AEA4009A871D /* OrderedCollections in Frameworks */,
 				799EDBA12FFBC799003813BC /* AsyncStreaming in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -90,6 +92,7 @@
 				799EDB9B2FFBC74C003813BC /* Algorithms */,
 				799EDB9E2FFBC799003813BC /* AsyncAlgorithms */,
 				799EDBA02FFBC799003813BC /* AsyncStreaming */,
+				791DED943003AEA4009A871D /* OrderedCollections */,
 			);
 			productName = erp;
 			productReference = 799EDB432FF90785003813BC /* erp.app */;
@@ -122,6 +125,7 @@
 			packageReferences = (
 				799EDB9A2FFBC74C003813BC /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 				799EDB9D2FFBC799003813BC /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
+				791DED933003AEA4009A871D /* XCRemoteSwiftPackageReference "swift-collections" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 799EDB442FF90785003813BC /* Products */;
@@ -367,6 +371,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		791DED933003AEA4009A871D /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.6.0;
+			};
+		};
 		799EDB9A2FFBC74C003813BC /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-algorithms.git";
@@ -386,6 +398,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		791DED943003AEA4009A871D /* OrderedCollections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 791DED933003AEA4009A871D /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = OrderedCollections;
+		};
 		799EDB9B2FFBC74C003813BC /* Algorithms */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 799EDB9A2FFBC74C003813BC /* XCRemoteSwiftPackageReference "swift-algorithms" */;
