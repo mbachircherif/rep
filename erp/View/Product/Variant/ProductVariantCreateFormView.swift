@@ -32,40 +32,35 @@ struct ProductVariantCreateFormView: View {
             }
 
             Section {
-                HStack {
-                    TextField("Price", value: $price.amount, format: .currency(code: price.currency.rawValue))
+                TextField("", value: $price.amount, format: .currency(code: price.currency.rawValue))
 
-                    Picker(price.currency.rawValue, selection: $price.currency) {
-                        Group {
-                            ForEach(Currency.allCases, id: \.self) { currency in
-                                Text(currency.rawValue)
-                                    .tag(currency)
-                            }
+                Picker("Devise", selection: $price.currency) {
+                    Group {
+                        ForEach(Currency.allCases, id: \.self) { currency in
+                            Text(currency.rawValue)
+                                .tag(currency)
                         }
                     }
                 }
+            } header: {
+                Text("Prix")
             }
 
             Section {
-                HStack {
-                    TextField("Stock", value: $stock.amount, format: .number)
+                TextField("", value: $stock.amount, format: .number)
 
-                    Picker(selection: $stock.unit) {
-                        Group {
-                            ForEach(Unit.allCases, id: \.self) { unit in
-                                switch unit {
-                                case .quantity:
-                                    Text("Unité")
-                                }
+                Picker("Unité", selection: $stock.unit) {
+                    Group {
+                        ForEach(Unit.allCases, id: \.self) { unit in
+                            switch unit {
+                            case .quantity:
+                                Text("Quantité")
                             }
-                        }
-                    } label: {
-                        switch stock.unit {
-                        case .quantity:
-                            Text("Unité")
                         }
                     }
                 }
+            } header: {
+                Text("Stock")
             }
         }
         .toolbar {
