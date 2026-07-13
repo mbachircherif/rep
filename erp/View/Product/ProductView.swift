@@ -16,48 +16,51 @@ struct ProductView: View {
     private var db
 
     @State
-    private var showAttributeMaker: ProductVariant?
+    private var productVariantCreateFormPresented: Bool = false
 
     var product: Product
 
     var body: some View {
         List {
-            Text(product.id.debugDescription)
+
+            Section {
+                LabeledContent("Nom", value: product.name)
+            } header: {
+                Text("Détail")
+            }
 
             Section {
                 ForEach(product.variants) { variant in
-                    DisclosureGroup {
-                        ForEach(variant.attributes) { attribute in
-                            Text(attribute.id.debugDescription)
-                        }
-
-                        Button("Add Attribute") {
-                            showAttributeMaker = variant
-                        }
+                    NavigationLink {
+                        ProductVariantView(variant: variant)
                     } label: {
-                        Text("Variant \(variant.id.debugDescription)")
+                        HStack {
+                            Text(variant.sku)
+
+                            Spacer()
+
+                            Text(variant.price.amount, format: .currency(code: variant.price.currency.rawValue))
+                        }
                     }
                 }
-            }
-        }
-        .sheet(item: $showAttributeMaker) { variant in
-            NavigationStack {
-                AttributeFormView(variant: variant)
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "xmark")
-                }
-            }
 
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Add") {
-                    product.variants.append(ProductVariant(sku: "SKU-\(product.variants.count)", product: product, attributes: [], price: Price(amount: 100.0, currency: .eur), stock: Stock(amount: 100, unit: .quantity)))
+                Button("Ajouter un variant") {
+                    productVariantCreateFormPresented = true
                 }
+            } header: {
+                Text("Variants")
+            }
+        }
+        .sheet(isPresented: $productVariantCreateFormPresented) {
+            NavigationStack {
+                ProductVariantCreateFormView(product: product)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button(role: .cancel) {
+                                productVariantCreateFormPresented = false
+                            }
+                        }
+                    }
             }
         }
     }

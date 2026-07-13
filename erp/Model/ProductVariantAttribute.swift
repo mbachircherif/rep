@@ -15,12 +15,15 @@ final class ProductVariantAttribute: VariantAttribute, Sendable {
 
     var variant: ProductVariant
 
+    var kind: AttributeKind
+
     var key: String
 
     var value: String
 
-    init(variant: ProductVariant, key: String, value: String) {
+    init(variant: ProductVariant, kind: AttributeKind, key: String, value: String) {
         self.variant = variant
+        self.kind = kind
         self.key = key
         self.value = value
     }

@@ -101,9 +101,11 @@ struct ContentView: View {
             case .customer:
                 CustomerListView()
             case .product:
-                ProductListView(products: [])
+                NavigationStack {
+                    ProductListView()
+                }
             case .order:
-                OrderListView(orders: [])
+                OrderListView()
             case .main:
                 ScrollView(.vertical) {
                     LazyVStack {

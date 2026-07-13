@@ -8,7 +8,7 @@
 import FoundationModels
 
 @Generable
-enum Currency: String, Codable {
+enum Currency: String, Codable, CaseIterable {
 
     case eur = "EUR"
 

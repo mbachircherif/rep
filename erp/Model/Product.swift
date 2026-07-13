@@ -9,8 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-@MainActor
-final class Product: Sendable {
+final class Product {
 
     @Attribute(.unique)
     var name: String

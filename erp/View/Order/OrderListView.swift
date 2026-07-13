@@ -10,40 +10,71 @@ import SwiftUI
 
 struct OrderListView: View {
 
-    @Environment(SwiftDataManager.self)
-    private var db
+    @Environment(\.modelContext)
+    private var modelContext
 
-    var orders: [Order]
+    @Query
+    private var orders: [Order]
 
     @State
     private var selectedOrder: Order?
 
     @State
-    private var orderForm: ModalState = .dismissed
+    private var createOrderFormPresented: Bool = false
 
     var body: some View {
         List {
-            ForEach(orders) { product in
+            ForEach(orders) { order in
                 Button {
-                    selectedOrder = product
+                    selectedOrder = order
                 } label: {
-//                    ProductListItem(product: product)
+                    Text(order.id.debugDescription)
                 }
             }
+
+            if orders.isEmpty {
+                Text("Aucune commande n'a été créée pour l'instant.")
+            }
         }
-        .sheet(isPresented: Binding(get: { orderForm == .presented }, set: { orderForm = $0 ? .presented : .dismissed })) {
-            OrderFormView()
+        .sheet(isPresented: $createOrderFormPresented) {
+            NavigationStack {
+                OrderCreateFormView()
+                    .toolbar {
+                        Button {
+                            createOrderFormPresented = false
+                        } label: {
+                            Image(systemName: "xmark")
+                        }
+                    }
+            }
         }
         .sheet(item: $selectedOrder) { order in
             NavigationStack {
-//                ProductView(product: product)
+                OrderUpdateFormView(id: order.persistentModelID)
+                    .environment(\.modelContext, ModelContext.appContext(modelContext.container))
+                    .toolbar {
+                        Button {
+                            selectedOrder = nil
+                        } label: {
+                            Image(systemName: "xmark")
+                        }
+                    }
             }
             .presentationDetents([.large])
+        }
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    createOrderFormPresented = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
         }
     }
 }
 
 #Preview {
-    OrderListView(orders: [])
+    OrderListView()
 }
 

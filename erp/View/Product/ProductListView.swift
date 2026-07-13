@@ -10,10 +10,11 @@ import SwiftUI
 
 struct ProductListView: View {
 
-    @Environment(SwiftDataManager.self)
-    private var db
+    @Environment(\.modelContext)
+    private var modelContext
 
-    var products: [Product]
+    @Query
+    private var products: [Product]
 
     @State
     private var selectedProduct: Product?
@@ -21,8 +22,8 @@ struct ProductListView: View {
     var body: some View {
         List {
             ForEach(products) { product in
-                Button {
-                    selectedProduct = product
+                NavigationLink {
+                    ProductView(product: product)
                 } label: {
                     ProductListItem(product: product)
                 }
@@ -37,10 +38,8 @@ struct ProductListView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Add") {
-                    Task {
-                        await db.insert(Product(name: "product_\(products.count)", price: .init(amount: 10.0, currency: .eur)))
-                        await db.unsafeSave()
-                    }
+                    modelContext.insert(Product(name: "product_\(products.count)", price: .init(amount: 10.0, currency: .eur)))
+                    try? modelContext.save()
                 }
             }
         }
@@ -48,5 +47,5 @@ struct ProductListView: View {
 }
 
 #Preview {
-    ProductListView(products: [])
+    ProductListView()
 }

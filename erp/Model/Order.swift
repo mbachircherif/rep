@@ -9,27 +9,29 @@ import Foundation
 import SwiftData
 
 @Model
-@MainActor
-final class Order: Sendable {
+final class Order {
+
+    @Attribute(.unique)
+    var number: UUID = UUID()
 
     var customer: OrderCustomer
 
+    @Relationship(deleteRule: .cascade, inverse: \OrderLine.order)
     var lines: [OrderLine] = []
 
     var status: Status
 
-    private(set) var createdAt: Date = Date()
+    var createdAt: Date = Date()
 
-    init(customer: OrderCustomer, lines: [OrderLine]) {
+    init(customer: OrderCustomer, status: Status = .waiting) {
         self.customer = customer
-        self.lines = lines
-        self.status = .waiting
+        self.status = status
     }
 }
 
 extension Order {
 
-    enum Status: Codable {
+    enum Status: Codable, CaseIterable {
 
         case waiting
 

@@ -12,6 +12,21 @@ struct ProductListItem: View {
     var product: Product
 
     var body: some View {
-        Text(product.id.debugDescription)
+        HStack(spacing: 16.0) {
+
+            // Image placeholder
+            ContainerRelativeShape()
+                .fill(.gray.quinary)
+                .aspectRatio(1, contentMode: .fit)
+                .frame(maxWidth: 50.0)
+
+            Text(product.name)
+                .fontDesign(.rounded)
+
+            Spacer()
+
+            Text("Variants: \(product.variants.count, format: .number)")
+                .fontDesign(.rounded)
+        }
     }
 }

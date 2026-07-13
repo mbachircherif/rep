@@ -1,5 +1,5 @@
 //
-//  OrderFormView.swift
+//  OrderCreateFormView.swift
 //  erp
 //
 //  Created by Mohamed BACHIR-CHERIF on 12/07/2026.
@@ -9,13 +9,16 @@ import OrderedCollections
 import SwiftData
 import SwiftUI
 
-struct OrderFormView: View {
+struct OrderCreateFormView: View {
 
-    @Environment(SwiftDataManager.self)
-    private var db
+    @Environment(\.dismiss)
+    private var dismiss
+
+    @Environment(\.modelContext)
+    private var modelContext
 
     @State
-    private var selectedCustomer: Customer?
+    private var customer: OrderCustomer?
 
     @State
     private var selectedVariants: OrderedSet<OrderVariant> = []
@@ -42,15 +45,27 @@ struct OrderFormView: View {
             }
 
             Section {
-                NavigationLink("Select customer") {
+                NavigationLink {
                     List {
                         ForEach(customers) { customer in
                             Button {
-                                selectedCustomer = customer
+                                self.customer = OrderCustomer(firstName: customer.firstName, lastName: customer.lastName)
                             } label: {
-                                Text(customer.fullName)
+                                HStack {
+                                    Text(customer.fullName)
+
+                                    Spacer()
+
+                                    Image(systemName: "checkmark.circle.fill")
+                                }
                             }
                         }
+                    }
+                } label: {
+                    if let customer = customer {
+                        Text("\(customer.firstName) \(customer.lastName)")
+                    } else {
+                        Text("Select a customer")
                     }
                 }
             }
@@ -64,7 +79,7 @@ struct OrderFormView: View {
                                 let orderVariant = OrderVariant(
                                     sku: variant.sku,
                                     attributes: variant.attributes.map {
-                                        OrderVariantAttribute(key: $0.key, value: $0.value)
+                                        OrderVariantAttribute(kind: $0.kind, key: $0.key, value: $0.value)
                                     },
                                     price: Price(amount: variant.price.amount, currency: variant.price.currency),
                                     stock: Stock(amount: variant.stock.amount, unit: variant.stock.unit)
@@ -100,26 +115,15 @@ struct OrderFormView: View {
             }
 
             Button("Create") {
-                if let selectedCustomer {
+                if let customer {
+                    let order = Order(customer: customer)
+                    order.lines = selectedVariants.map { OrderLine(order: order, variant: $0, quantity: 1)}
 
-                    let order = Order(
-                        customer: OrderCustomer(
-                            firstName: selectedCustomer.firstName,
-                            lastName:  selectedCustomer.lastName
-                        ),
-                        lines: selectedVariants.map {
-                            OrderLine(
-                                variant: $0,
-                                quantity: 1
-                            )
-                        }
-                    )
-
-                    Task {
-                        await db.insert(order)
-                        await db.unsafeSave()
-                    }
+                    modelContext.insert(order)
+                    try? modelContext.save()
                 }
+
+                dismiss()
             }
         }
     }

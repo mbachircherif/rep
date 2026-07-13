@@ -9,6 +9,8 @@ import Foundation
 
 protocol VariantAttribute {
 
+    var kind: AttributeKind { get set }
+
     var key: String { get set }
 
     var value: String { get set }

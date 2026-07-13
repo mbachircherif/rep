@@ -5,7 +5,7 @@
 //  Created by Mohamed BACHIR-CHERIF on 08/07/2026.
 //
 
-enum Unit: Codable {
+enum Unit: Codable, CaseIterable {
 
     case quantity
 }

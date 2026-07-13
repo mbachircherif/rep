@@ -11,11 +11,14 @@ import SwiftData
 @Model
 final class OrderLine {
 
+    var order: Order
+
     var variant: OrderVariant
 
     var quantity: Int
 
-    init (variant: OrderVariant, quantity: Int) {
+    init(order: Order, variant: OrderVariant, quantity: Int) {
+        self.order = order
         self.variant = variant
         self.quantity = quantity
     }

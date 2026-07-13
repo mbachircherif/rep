@@ -15,7 +15,7 @@ struct erpApp: App {
 
     init() {
         do {
-            modelContainer = try ModelContainer(for: Product.self, Customer.self, configurations: .init(for: Product.self, Customer.self, isStoredInMemoryOnly: true))
+            modelContainer = try ModelContainer(for: Product.self, Customer.self, Order.self, configurations: .init(for: Product.self, Customer.self, Order.self, isStoredInMemoryOnly: true))
         } catch {
             fatalError("Failed to configure SwiftData container.")
         }

@@ -7,6 +7,8 @@
 
 struct OrderVariantAttribute: VariantAttribute, Codable, Hashable {
 
+    var kind: AttributeKind
+
     var key: String
 
     var value: String
