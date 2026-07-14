@@ -11,35 +11,102 @@ import SwiftUI
 
 struct OrderCreateFormView: View {
 
-    @Environment(\.dismiss)
-    private var dismiss
-
-    @Environment(\.modelContext)
-    private var modelContext
-
-    @State
-    private var customer: OrderCustomer?
-
-    @State
-    private var selectedVariants: OrderedSet<OrderVariant> = []
-
     @Query
     private var products: [Product]
 
     @Query
     private var customers: [Customer]
 
+    var order: Order
+
     var body: some View {
         Form {
-            ForEach(selectedVariants, id: \.sku) { variant in
-                HStack {
-                    Text(variant.sku)
-                        .font(.system(size: 13.0, design: .default))
-
-                    Button {
-                        selectedVariants.remove(variant)
+            Section {
+                ForEach(order.variants.enumerated(), id: \.element) { index, variant in
+                    NavigationLink {
+                        OrderVariantView(variant: variant)
+                            .onDelete {
+                                order.variants.remove(at: index)
+                            }
                     } label: {
-                        Image(systemName: "xmark.circle.fill")
+                        HStack(spacing: 16.0) {
+                            ContainerRelativeShape()
+                                .fill(.quinary)
+                                .aspectRatio(1, contentMode: .fit)
+                                .frame(maxWidth: 50.0)
+
+                            VStack(alignment: .leading, spacing: 8.0) {
+                                Text(variant.name)
+                                    .foregroundStyle(.primary)
+                                    .font(.default)
+                                    .lineLimit(1)
+
+                                Text(variant.sku)
+                                    .foregroundStyle(.secondary)
+                                    .font(.footnote)
+                                    .lineLimit(1)
+                            }
+
+                            Spacer()
+
+                            VStack(alignment: .trailing, spacing: 8.0) {
+                                Text("\(variant.subtotal, format: .currency(code: order.warehouse.currency.rawValue)) (HT)")
+                                    .lineLimit(1)
+
+                                Text("\(variant.stock.amount, format: .number) \(variant.stock.unit.symbol)")
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                            }
+                        }
+                    }
+                }
+
+                NavigationLink("Ajouter un variant") {
+                    List {
+                        ForEach(products) { product in
+                            DisclosureGroup(isExpanded: .constant(true)) {
+                                ForEach(product.variants) { variant in
+
+                                    let isSelected = order.variants.contains { $0.sku == variant.sku }
+
+                                    Button {
+                                        if isSelected {
+                                            order.variants.removeAll { $0.sku == variant.sku }
+                                        } else {
+                                            let orderVariant = OrderVariant(
+                                                reference: variant,
+                                                order: order,
+                                                sku: variant.sku,
+                                                name: product.name,
+                                                attributes: variant.attributes.map {
+                                                    OrderVariantAttribute(kind: $0.kind, key: $0.key, value: $0.value)
+                                                },
+                                                costPrice: variant.costPrice,
+                                                sellingPrice: variant.sellingPrice,
+                                                tax: Tax(rate: variant.tax.rate, behavior: variant.tax.behavior),
+                                                stock: Stock(amount: 1, unit: variant.stock.unit)
+                                            )
+                                            order.variants.append(orderVariant)
+                                        }
+                                    } label: {
+                                        HStack {
+                                            Text(variant.sku)
+
+                                            Spacer()
+
+                                            if isSelected {
+                                                Image(systemName: "check")
+                                                    .symbolVariant(.circle)
+                                                    .symbolVariant(.fill)
+                                            }
+                                        }
+                                    }
+                                }
+                            } label: {
+                                ProductListItem(product: product)
+                            }
+                        }
                     }
                 }
             }
@@ -49,7 +116,8 @@ struct OrderCreateFormView: View {
                     List {
                         ForEach(customers) { customer in
                             Button {
-                                self.customer = OrderCustomer(firstName: customer.firstName, lastName: customer.lastName)
+                                order.customer.firstName = customer.firstName
+                                order.customer.lastName  = customer.lastName
                             } label: {
                                 HStack {
                                     Text(customer.fullName)
@@ -62,69 +130,28 @@ struct OrderCreateFormView: View {
                         }
                     }
                 } label: {
-                    if let customer = customer {
-                        Text("\(customer.firstName) \(customer.lastName)")
-                    } else {
+                    if order.customer.firstName.isEmpty && order.customer.lastName.isEmpty {
                         Text("Select a customer")
+                    } else {
+                        Text("\(order.customer.firstName) \(order.customer.lastName)")
                     }
                 }
             }
 
-            NavigationLink("Add new variant") {
-                List {
-                    ForEach(products) { product in
-                        DisclosureGroup(isExpanded: .constant(true)) {
-                            ForEach(product.variants) { variant in
-
-                                let orderVariant = OrderVariant(
-                                    sku: variant.sku,
-                                    attributes: variant.attributes.map {
-                                        OrderVariantAttribute(kind: $0.kind, key: $0.key, value: $0.value)
-                                    },
-                                    price: Price(amount: variant.price.amount, currency: variant.price.currency),
-                                    stock: Stock(amount: variant.stock.amount, unit: variant.stock.unit)
-                                )
-
-                                let isSelected = selectedVariants.contains(orderVariant)
-
-                                Button {
-                                    if isSelected {
-                                        selectedVariants.remove(orderVariant)
-                                    } else {
-                                        selectedVariants.append(orderVariant)
-                                    }
-                                } label: {
-                                    HStack {
-                                        Text(variant.sku)
-
-                                        Spacer()
-
-                                        if isSelected {
-                                            Image(systemName: "check")
-                                                .symbolVariant(.circle)
-                                                .symbolVariant(.fill)
-                                        }
-                                    }
-                                }
-                            }
-                        } label: {
-                            ProductListItem(product: product)
-                        }
+            Section {
+                DisclosureGroup(isExpanded: .constant(true)) {
+                    ForEach(Array(order.taxes), id: \.key) { tax, amount in
+                        LabeledContent("TVA (\(tax.rate, format: .percent))", value: amount, format: .currency(code: order.warehouse.currency.rawValue))
                     }
-                }
-            }
-
-            Button("Create") {
-                if let customer {
-                    let order = Order(customer: customer)
-                    order.lines = selectedVariants.map { OrderLine(order: order, variant: $0, quantity: 1)}
-
-                    modelContext.insert(order)
-                    try? modelContext.save()
+                } label: {
+                    LabeledContent("Sous-total (HT)", value: order.subtotal, format: .currency(code: order.warehouse.currency.rawValue))
                 }
 
-                dismiss()
+                LabeledContent("Total", value: order.total, format: .currency(code: order.warehouse.currency.rawValue))
+                    .fontWeight(.medium)
             }
         }
+        .navigationTitle("Numéro de commande")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

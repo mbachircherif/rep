@@ -5,10 +5,12 @@
 //  Created by Mohamed BACHIR-CHERIF on 08/07/2026.
 //
 
+import Foundation
 import FoundationModels
 
 struct UpdateProductTool: Tool {
 
+    // TODO: Don't use this manager but the main actor context
     let databaseManager: SwiftDataManager
 
     let name = "updateProduct"
@@ -22,16 +24,12 @@ struct UpdateProductTool: Tool {
         var name: String
 
         @Guide(description: "Price of the product")
-        var price: Double
+        var price: Decimal
     }
 
     func call(arguments: Arguments) async throws -> String {
         guard let product = try await databaseManager.fetch(Product.fetchOne(by: arguments.name)).first else {
             throw UpdateProductToolError.productNotFound(name: arguments.name)
-        }
-
-        await MainActor.run {
-            product.price.amount = arguments.price
         }
 
         await databaseManager.unsafeSave()

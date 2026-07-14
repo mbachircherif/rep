@@ -50,7 +50,7 @@ struct CustomerListView: View {
         }
         .sheet(item: $createCustomer) { customer in
             NavigationStack {
-                CustomerCreateView(customer: customer)
+                CustomerCreateFormView(customer: customer)
                     .toolbar {
                         ToolbarItem(placement: .destructiveAction) {
                             Button {
@@ -65,7 +65,7 @@ struct CustomerListView: View {
         }
         .sheet(item: $updateCustomer) { customer in
             NavigationStack {
-                CustomerUpdateView(customer: customer)
+                CustomerUpdateFormView(id: customer.id)
                     .toolbar {
                         ToolbarItem(placement: .destructiveAction) {
                             Button {

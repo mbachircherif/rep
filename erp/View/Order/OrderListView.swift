@@ -13,48 +13,66 @@ struct OrderListView: View {
     @Environment(\.modelContext)
     private var modelContext
 
-    @Query
-    private var orders: [Order]
+    @Environment(Warehouse.self)
+    private var warehouse
 
     @State
-    private var selectedOrder: Order?
+    private var orderToCreate: Order?
 
     @State
-    private var createOrderFormPresented: Bool = false
+    private var orderToUpdate: Order?
+
+    @State
+    var orders: [Order]
 
     var body: some View {
         List {
-            ForEach(orders) { order in
-                Button {
-                    selectedOrder = order
-                } label: {
-                    Text(order.id.debugDescription)
+            Section {
+                ForEach(orders) { order in
+                    NavigationLink {
+                        OrderView(order: order)
+                    } label: {
+                        LabeledContent("Numéro", value: order.number.uuidString)
+                    }
                 }
+            } header: {
+                Text("Ventes")
             }
 
             if orders.isEmpty {
                 Text("Aucune commande n'a été créée pour l'instant.")
             }
         }
-        .sheet(isPresented: $createOrderFormPresented) {
+        .sheet(item: $orderToCreate) { order in
             NavigationStack {
-                OrderCreateFormView()
+                OrderCreateFormView(order: order)
                     .toolbar {
-                        Button {
-                            createOrderFormPresented = false
-                        } label: {
-                            Image(systemName: "xmark")
+                        // Create button
+                        ToolbarItem(placement: .primaryAction) {
+                            Button("Créer") {
+                                modelContext.insert(order)
+                                try? modelContext.save()
+                                orderToCreate = nil
+                            }
+                            .buttonStyle(.glassProminent)
+                        }
+
+                        // Dismiss button
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button(role: .cancel) {
+                                orderToCreate = nil
+                            }
                         }
                     }
             }
         }
-        .sheet(item: $selectedOrder) { order in
+        .sheet(item: $orderToUpdate) { order in
             NavigationStack {
                 OrderUpdateFormView(id: order.persistentModelID)
                     .environment(\.modelContext, ModelContext.appContext(modelContext.container))
                     .toolbar {
                         Button {
-                            selectedOrder = nil
+                            orderToUpdate = nil
                         } label: {
                             Image(systemName: "xmark")
                         }
@@ -65,7 +83,7 @@ struct OrderListView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
-                    createOrderFormPresented = true
+                    orderToCreate = Order(warehouse: warehouse)
                 } label: {
                     Image(systemName: "plus")
                 }
@@ -75,6 +93,6 @@ struct OrderListView: View {
 }
 
 #Preview {
-    OrderListView()
+    OrderListView(orders: [])
 }
 

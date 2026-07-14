@@ -1,5 +1,5 @@
 //
-//  CustomerUpdateView.swift
+//  CustomerCreateFormView.swift
 //  erp
 //
 //  Created by Mohamed BACHIR-CHERIF on 12/07/2026.
@@ -8,13 +8,13 @@
 import SwiftData
 import SwiftUI
 
-struct CustomerUpdateView: View {
-
-    @Environment(\.dismiss)
-    private var dismiss
+struct CustomerCreateFormView: View {
 
     @Environment(\.modelContext)
     private var modelContext
+
+    @Environment(\.dismiss)
+    private var dismiss
 
     var customer: Customer
 
@@ -28,6 +28,8 @@ struct CustomerUpdateView: View {
                 ContainerRelativeShape()
                     .fill(.gray.quinary)
                     .aspectRatio(1, contentMode: .fit)
+                    .frame(maxWidth: 150.0)
+                    .frame(maxWidth: .infinity)
                     .listRowBackground(Color.clear)
             }
 
@@ -43,10 +45,12 @@ struct CustomerUpdateView: View {
                 TextField("Phone", text: $customer.phone)
             }
 
-            Button("Update") {
+            Button("Create") {
+                modelContext.insert(customer)
                 try? modelContext.save()
                 dismiss()
             }
         }
     }
 }
+

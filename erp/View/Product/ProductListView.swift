@@ -13,11 +13,13 @@ struct ProductListView: View {
     @Environment(\.modelContext)
     private var modelContext
 
-    @Query
-    private var products: [Product]
-
     @State
     private var selectedProduct: Product?
+
+    @State
+    private var productCreateFormPresented: Bool = false
+
+    var products: [Product]
 
     var body: some View {
         List {
@@ -29,17 +31,30 @@ struct ProductListView: View {
                 }
             }
         }
+        .sheet(isPresented: $productCreateFormPresented) {
+            NavigationStack {
+                ProductCreateFormView()
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button(role: .cancel) {
+                                productCreateFormPresented = false
+                            }
+                        }
+                    }
+            }
+        }
         .sheet(item: $selectedProduct) { product in
             NavigationStack {
                 ProductView(product: product)
             }
             .presentationDetents([.large])
         }
+        .navigationTitle("Produits")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Add") {
-                    modelContext.insert(Product(name: "product_\(products.count)", price: .init(amount: 10.0, currency: .eur)))
-                    try? modelContext.save()
+                Button("Nouveau") {
+                    productCreateFormPresented = true
                 }
             }
         }
@@ -47,5 +62,5 @@ struct ProductListView: View {
 }
 
 #Preview {
-    ProductListView()
+    ProductListView(products: [])
 }

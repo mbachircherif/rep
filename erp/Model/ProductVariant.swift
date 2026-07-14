@@ -5,10 +5,10 @@
 //  Created by Mohamed BACHIR-CHERIF on 11/07/2026.
 //
 
+import Foundation
 import SwiftData
 
 @Model
-@MainActor
 final class ProductVariant: Variant {
 
     @Attribute(.unique)
@@ -19,15 +19,35 @@ final class ProductVariant: Variant {
     @Relationship(deleteRule: .cascade, inverse: \ProductVariantAttribute.variant)
     var attributes: [ProductVariantAttribute] = []
 
-    var price: Price
+    var costPrice: Decimal
+
+    var sellingPrice: Decimal
 
     var stock: Stock
 
-    init(sku: String, product: Product, attributes: [ProductVariantAttribute], price: Price, stock: Stock) {
+    var tax: Tax
+
+    init(sku: String, product: Product, attributes: [ProductVariantAttribute], costPrice: Decimal, sellingPrice: Decimal, tax: Tax, stock: Stock) {
         self.sku = sku
         self.product = product
         self.attributes = attributes
-        self.price = price
+        self.costPrice = costPrice
+        self.sellingPrice = sellingPrice
+        self.tax = tax
         self.stock = stock
+    }
+}
+
+extension ProductVariant: Equatable {
+
+    static func == (lhs: ProductVariant, rhs: ProductVariant) -> Bool {
+        lhs.sku == rhs.sku
+    }
+}
+
+extension ProductVariant: Hashable {
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(sku)
     }
 }

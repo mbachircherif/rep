@@ -17,7 +17,7 @@ struct ProductSearchListView: View {
 
     var body: some View {
         SearchView { query in
-            ProductListView()
+            ProductListView(products: products)
                 .task(id: query) {
                     if query == "" {
                         products = []

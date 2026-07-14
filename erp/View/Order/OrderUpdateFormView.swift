@@ -61,20 +61,26 @@ struct OrderUpdateFormView: View {
                     }
                 }
 
-                ForEach(order.lines) { line in
+                ForEach(order.variants) { variant in
                     HStack {
-                        Text(line.variant.sku)
+                        Text(variant.sku)
                             .font(.system(size: 13.0, design: .default))
 
-                        Text(line.quantity, format: .number)
+                        Text(variant.stock.amount, format: .number)
                     }
                 }
 
                 Section {
-                    Text("\(order.customer.firstName) \(order.customer.lastName)")
+                    if order.customer.firstName.isEmpty && order.customer.lastName.isEmpty {
+                        Text("Aucun client associé.")
+                    } else {
+                        Text("\(order.customer.firstName) \(order.customer.firstName)")
+                    }
+                } header: {
+                    Text("Client")
                 }
 
-                Button("Update") {
+                Button("Enregistrer") {
                     try? modelContext.save()
                 }
             }

@@ -11,18 +11,21 @@ import SwiftData
 @Model
 final class Product {
 
+    var warehouse: Warehouse
+
     @Attribute(.unique)
     var name: String
-
-    var price: Price
 
     @Relationship(deleteRule: .cascade, inverse: \ProductVariant.product)
     var variants: [ProductVariant] = []
 
-    init(name: String, price: Price) {
+    init(warehouse: Warehouse, name: String) {
+        self.warehouse = warehouse
         self.name = name
-        self.price = price
     }
+}
+
+extension Product {
 
     static func fetchOne(by name: String) -> FetchDescriptor<Product> {
         var descriptor = FetchDescriptor<Product>()

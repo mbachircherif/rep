@@ -7,7 +7,7 @@
 
 struct OrderCustomer: Codable {
 
-    var firstName: String
+    var firstName: String = ""
 
-    var lastName: String
+    var lastName: String = ""
 }

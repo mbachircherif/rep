@@ -39,7 +39,7 @@ struct ProductView: View {
 
                             Spacer()
 
-                            Text(variant.price.amount, format: .currency(code: variant.price.currency.rawValue))
+                            Text(variant.sellingPrice, format: .currency(code: product.warehouse.currency.rawValue))
                         }
                     }
                 }

@@ -15,7 +15,11 @@ protocol Variant {
 
     var attributes: [Variant] { get set }
 
-    var price: Price { get set }
+    var costPrice: Decimal { get set }
+
+    var sellingPrice: Decimal { get set }
+
+    var tax: Tax { get set }
 
     var stock: Stock { get set }
 }

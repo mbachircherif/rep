@@ -69,10 +69,19 @@ struct ContentView: View {
     @State
     private var selectedColumn: Column = .product
 
+    @Query
+    private var warehouses: [Warehouse]
+
     var body: some View {
+        NavigationStack {
+            WarehouseListView(warehouses: warehouses)
+        }
+        /*
         NavigationSplitView {
             List {
                 ForEach(columns) { column in
+                    let backgroundColor: some ShapeStyle = selectedColumn == column ? .blue : .clear
+
                     Group {
                         switch column {
                         case .main:
@@ -93,7 +102,7 @@ struct ContentView: View {
                             }
                         }
                     }
-                    .listRowBackground(selectedColumn == column ? Color.blue : Color.clear)
+                    .listRowBackground(Capsule().fill(backgroundColor))
                 }
             }
         } detail: {
@@ -243,6 +252,7 @@ struct ContentView: View {
                 }
             }
         }
+         */
     }
 }
 

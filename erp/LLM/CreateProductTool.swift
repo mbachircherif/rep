@@ -5,6 +5,7 @@
 //  Created by Mohamed BACHIR-CHERIF on 04/07/2026.
 //
 
+import Foundation
 import FoundationModels
 
 struct CreateProductTool: Tool {
@@ -25,7 +26,7 @@ struct CreateProductTool: Tool {
         struct Price {
 
             @Guide(description: "The price amount")
-            let amount: Double
+            let amount: Decimal
 
             @Guide(description: "The price currency")
             let currency: Currency
@@ -36,7 +37,7 @@ struct CreateProductTool: Tool {
     }
 
     func call(arguments: Arguments) async throws -> String {
-        await databaseManager.insert(Product(name: arguments.name, price: Price(amount: arguments.price.amount, currency: arguments.price.currency)))
+//        await databaseManager.insert(Product(warehouse: , name: arguments.name))
         await databaseManager.unsafeSave()
         await databaseManager.sync()
 

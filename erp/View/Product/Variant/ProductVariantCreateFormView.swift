@@ -5,7 +5,6 @@
 //  Created by Mohamed BACHIR-CHERIF on 13/07/2026.
 //
 
-import SwiftData
 import SwiftUI
 
 struct ProductVariantCreateFormView: View {
@@ -17,7 +16,13 @@ struct ProductVariantCreateFormView: View {
     private var sku: String = ""
 
     @State
-    private var price: Price = Price(amount: 0.0, currency: .eur)
+    private var costPrice: Decimal = 0.0
+
+    @State
+    private var sellingPrice: Decimal = 0.0
+
+    @State
+    private var tax: Tax = Tax(rate: 0.0, behavior: .inclusive)
 
     @State
     private var stock: Stock = Stock()
@@ -32,22 +37,34 @@ struct ProductVariantCreateFormView: View {
             }
 
             Section {
-                TextField("", value: $price.amount, format: .currency(code: price.currency.rawValue))
+                LabeledContent("Prix de revient") {
+                    TextField("", value: $costPrice, format: .currency(code: product.warehouse.currency.rawValue))
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                }
 
-                Picker("Devise", selection: $price.currency) {
-                    Group {
-                        ForEach(Currency.allCases, id: \.self) { currency in
-                            Text(currency.rawValue)
-                                .tag(currency)
-                        }
-                    }
+                LabeledContent("Prix de vente") {
+                    TextField("", value: $sellingPrice, format: .currency(code: product.warehouse.currency.rawValue))
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
                 }
             } header: {
                 Text("Prix")
             }
 
             Section {
+                LabeledContent("Taux") {
+                    TextField("", value: $tax.rate, format: .percent)
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                }
+            } header: {
+                Text("TVA")
+            }
+
+            Section {
                 TextField("", value: $stock.amount, format: .number)
+                    .keyboardType(.decimalPad)
 
                 Picker("Unité", selection: $stock.unit) {
                     Group {
@@ -66,9 +83,10 @@ struct ProductVariantCreateFormView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button("Ajouter") {
-                    product.variants.append(ProductVariant(sku: sku, product: product, attributes: [], price: price, stock: stock))
+                    product.variants.append(ProductVariant(sku: sku, product: product, attributes: [], costPrice: costPrice, sellingPrice: sellingPrice, tax: tax, stock: stock))
                     dismiss()
                 }
+                .buttonStyle(.glassProminent)
             }
         }
     }

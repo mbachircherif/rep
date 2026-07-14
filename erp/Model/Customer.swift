@@ -23,7 +23,7 @@ final class Customer {
         "\(firstName) \(lastName)"
     }
 
-    private(set) var createdAt: Date = Date()
+    var createdAt: Date = Date()
 
     init(firstName: String = "", lastName: String = "", email: String = "", phone: String = "") {
         self.firstName = firstName

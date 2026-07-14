@@ -25,8 +25,8 @@ struct InsertProductTransactionView: View {
             Spacer()
 
             VStack(alignment: .trailing) {
-                Text(product.price.amount, format: .currency(code: product.price.currency.rawValue))
-                    .font(.system(size: 13.0))
+//                Text(product.price.amount, format: .currency(code: product.price.currency.rawValue))
+//                    .font(.system(size: 13.0))
 
                 Spacer()
 
@@ -43,7 +43,7 @@ struct InsertProductTransactionView: View {
 }
 
 #Preview {
-    InsertProductTransactionView(product: Product(name: "ESP 230", price: Price(amount: 630.0, currency: .eur)))
+    InsertProductTransactionView(product: Product(warehouse: Warehouse(name: "Preview", currency: .eur), name: "ESP 230"))
         .frame(height: 100.0)
         .padding()
 }
