@@ -5,26 +5,31 @@
 //  Created by Mohamed BACHIR-CHERIF on 11/07/2026.
 //
 
+import Foundation
 import SwiftData
 
 @Model
-@MainActor
-final class ProductVariantAttribute: VariantAttribute, Sendable {
+final class ProductVariantAttribute {
 
-    #Unique<ProductVariantAttribute>([\.variant, \.key])
+    #Unique<ProductVariantAttribute>([\.variant, \.value])
 
     var variant: ProductVariant
 
-    var kind: AttributeKind
+    var value: ProductOptionValue
 
-    var key: String
-
-    var value: String
-
-    init(variant: ProductVariant, kind: AttributeKind, key: String, value: String) {
+    init(variant: ProductVariant, value: ProductOptionValue) {
         self.variant = variant
-        self.kind = kind
-        self.key = key
-        self.value = value
+        self.value   = value
+    }
+}
+
+extension ProductVariantAttribute {
+
+    static func fetchMany(by variant: ProductVariant) -> FetchDescriptor<ProductVariantAttribute> {
+        var fetchDescriptor = FetchDescriptor<ProductVariantAttribute>()
+
+        fetchDescriptor.predicate = #Predicate { $0.variant == variant }
+
+        return fetchDescriptor
     }
 }

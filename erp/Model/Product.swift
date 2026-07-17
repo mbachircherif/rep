@@ -16,6 +16,9 @@ final class Product {
     @Attribute(.unique)
     var name: String
 
+    @Relationship(deleteRule: .cascade, inverse: \ProductOption.product)
+    var options: [ProductOption] = []
+
     @Relationship(deleteRule: .cascade, inverse: \ProductVariant.product)
     var variants: [ProductVariant] = []
 

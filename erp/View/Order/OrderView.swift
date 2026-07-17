@@ -9,15 +9,22 @@ import SwiftUI
 
 struct OrderView: View {
 
+    @Bindable
     var order: Order
 
     var body: some View {
         List {
-
             Section {
                 LabeledContent("Number", value: order.number.uuidString)
 
-                LabeledContent("Status") {
+                Picker(selection: $order.status) {
+                    Text("En attente")
+                        .tag(Order.Status.waiting)
+                    Text("Payé")
+                        .tag(Order.Status.paid)
+                    Text("Annulée")
+                        .tag(Order.Status.canceled)
+                } label: {
                     switch order.status {
                     case .waiting:
                         HStack {
@@ -41,7 +48,7 @@ struct OrderView: View {
                                 .fill(.red)
                                 .fixedSize()
 
-                            Text("Annulés")
+                            Text("Annulée")
                         }
                     }
                 }

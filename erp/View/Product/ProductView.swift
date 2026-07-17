@@ -30,6 +30,28 @@ struct ProductView: View {
             }
 
             Section {
+                ForEach(product.options) { option in
+                    NavigationLink {
+                        ProductVariantView(variant: variant)
+                    } label: {
+                        HStack {
+                            Text(variant.sku)
+
+                            Spacer()
+
+                            Text(variant.sellingPrice, format: .currency(code: product.warehouse.currency.rawValue))
+                        }
+                    }
+                }
+
+                Button("Ajouter un variant") {
+                    productVariantCreateFormPresented = true
+                }
+            } header: {
+                Text("Options")
+            }
+
+            Section {
                 ForEach(product.variants) { variant in
                     NavigationLink {
                         ProductVariantView(variant: variant)
