@@ -17,4 +17,17 @@ extension ModelContext {
 
         return context
     }
+
+    func newContext(autosave: Bool = false) -> ModelContext {
+        let context = ModelContext(container)
+
+        context.autosaveEnabled = autosave
+
+        return context
+    }
+
+    convenience init(_ container: ModelContainer, autosave: Bool = false) {
+        self.init(container)
+        self.autosaveEnabled = autosave
+    }
 }

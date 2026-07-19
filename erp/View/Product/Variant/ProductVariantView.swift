@@ -29,20 +29,20 @@ struct ProductVariantView: View {
             Section {
                 ForEach(variant.attributes.enumerated(), id: \.element) { index, attribute in
                     HStack(spacing: 24.0) {
-                        Text(attribute.key)
+                        Text(attribute.optionValue.name)
 
                         Spacer()
 
-                        switch attribute.kind {
-                        case .color:
-                            if let color = Color(hex: attribute.value) {
-                                Circle()
-                                    .fill(color)
-                                    .frame(width: 20.0, height: 20.0)
-                            }
-                        case .custom:
-                            Text(attribute.value)
-                        }
+//                        switch attribute.kind {
+//                        case .color:
+//                            if let color = Color(hex: attribute.value) {
+//                                Circle()
+//                                    .fill(color)
+//                                    .frame(width: 20.0, height: 20.0)
+//                            }
+//                        case .custom:
+//                            Text(attribute.value)
+//                        }
 
                         Button {
                             variant.attributes.remove(at: index)

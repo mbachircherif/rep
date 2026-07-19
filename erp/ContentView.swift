@@ -75,6 +75,10 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             WarehouseListView(warehouses: warehouses)
+                .onAppear {
+                    print("MAIN ACTOR MODEL CONTEXT: \(Unmanaged.passUnretained(modelContext).toOpaque())")
+                }
+
         }
         /*
         NavigationSplitView {

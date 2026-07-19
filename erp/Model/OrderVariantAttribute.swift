@@ -8,7 +8,7 @@
 import SwiftData
 
 @Model
-final class OrderVariantAttribute: VariantAttribute {
+final class OrderVariantAttribute {
 
     var kind: AttributeKind
 

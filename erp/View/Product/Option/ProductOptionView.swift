@@ -13,6 +13,9 @@ struct ProductOptionView: View {
     @Environment(\.modelContext)
     private var modelContext
 
+    @State
+    private var optionValueToCreate: ProductOptionValue?
+
     var option: ProductOption
 
     var body: some View {
@@ -26,35 +29,57 @@ struct ProductOptionView: View {
             Section {
                 ForEach(option.values.enumerated(), id: \.element) { index, value in
                     HStack {
-                        Text(value.value)
+                        Text(value.name)
 
                         Spacer()
 
-                        Button {
-                            option.values.remove(at: index)
+                        Menu {
+                            NavigationLink {
+                                ProductOptionValueView(value: value)
+                                    .environment(\.modelContext, modelContext)
+                            } label: {
+                                Label("Modifier", systemImage: "pencil")
+                            }
+
+                            Divider()
+
+                            Button(role: .destructive) {
+                                option.values.remove(at: index)
+                            } label: {
+                                Label("Supprimer", systemImage: "trash")
+                            }
                         } label: {
-                            Image(systemName: "xmark.circle.fill")
+                            Image(systemName: "ellipsis")
                         }
+                        .containerShape(.rect)
                     }
                 }
+
+                Button("Ajouter une valeur") {
+                    optionValueToCreate = ProductOptionValue(option: option)
+                }
+            }
+        }
+        .sheet(item: $optionValueToCreate) { optionValue in
+            NavigationStack {
+                ProductOptionValueCreateFormView(value: optionValue)
             }
         }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
-                Button("Update") {
-                    // TODO: Make bulk update easier.
-                    for variant in option.product.variants {
-                        for attribute in variant.attributes {
-                            if attribute.name == option.name {
-                                attribute.name = option.name
-                            }
-                        }
-                    }
-
-                    try? modelContext.save()
+                Button("Sauvegarder") {
+                    update()
                 }
                 .disabled(!modelContext.hasChanges)
             }
+        }
+    }
+
+    private func update() {
+        do {
+            try modelContext.save()
+        } catch {
+            print(error.localizedDescription)
         }
     }
 }

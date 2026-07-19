@@ -5,6 +5,7 @@
 //  Created by Mohamed BACHIR-CHERIF on 11/07/2026.
 //
 
+import SwiftData
 import SwiftUI
 
 struct ProductView: View {
@@ -15,8 +16,17 @@ struct ProductView: View {
     @Environment(SwiftDataManager.self)
     private var db
 
+    @Environment(\.modelContext)
+    private var modelContext
+
     @State
     private var productVariantCreateFormPresented: Bool = false
+
+    @State
+    private var productOptionCreateFormPresented: Bool = false
+
+    @State
+    private var productOptionToCreate: ProductOption?
 
     var product: Product
 
@@ -32,20 +42,16 @@ struct ProductView: View {
             Section {
                 ForEach(product.options) { option in
                     NavigationLink {
-                        ProductVariantView(variant: variant)
-                    } label: {
-                        HStack {
-                            Text(variant.sku)
-
-                            Spacer()
-
-                            Text(variant.sellingPrice, format: .currency(code: product.warehouse.currency.rawValue))
+                        FetchModelView(type: ProductOption.self, id: option.id, container: modelContext.container) { option in
+                            ProductOptionView(option: option)
                         }
+                    } label: {
+                        Text(option.name)
                     }
                 }
 
-                Button("Ajouter un variant") {
-                    productVariantCreateFormPresented = true
+                Button("Ajouter une option") {
+                    productOptionToCreate = ProductOption(product: product)
                 }
             } header: {
                 Text("Options")
@@ -65,12 +71,16 @@ struct ProductView: View {
                         }
                     }
                 }
-
-                Button("Ajouter un variant") {
-                    productVariantCreateFormPresented = true
-                }
             } header: {
                 Text("Variants")
+            }
+        }
+        .onAppear {
+            print("MAIN ACTOR MODEL CONTEXT: \(Unmanaged.passUnretained(modelContext).toOpaque())")
+        }
+        .sheet(item: $productOptionToCreate) { productOption in
+            NavigationStack {
+                ProductOptionCreateFormView(option: productOption)
             }
         }
         .sheet(isPresented: $productVariantCreateFormPresented) {

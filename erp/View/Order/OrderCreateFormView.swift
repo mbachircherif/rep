@@ -79,9 +79,9 @@ struct OrderCreateFormView: View {
                                                 order: order,
                                                 sku: variant.sku,
                                                 name: product.name,
-                                                attributes: variant.attributes.map {
+                                                attributes: []/*variant.attributes.map {
                                                     OrderVariantAttribute(kind: $0.kind, key: $0.key, value: $0.value)
-                                                },
+                                                }*/,
                                                 costPrice: variant.costPrice,
                                                 sellingPrice: variant.sellingPrice,
                                                 tax: Tax(rate: variant.tax.rate, behavior: variant.tax.behavior),

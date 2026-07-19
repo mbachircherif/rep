@@ -17,9 +17,6 @@ struct ProductVariantAttributeCreateFormView: View {
     private var modelContext
 
     @State
-    private var kind: AttributeKind = .color
-
-    @State
     private var key: String = ""
 
     @State
@@ -29,30 +26,13 @@ struct ProductVariantAttributeCreateFormView: View {
 
     var body: some View {
         Form {
-            Picker("Kind", selection: $kind) {
-                Text("Color")
-                    .tag(AttributeKind.color)
-
-                Text("Custom")
-                    .tag(AttributeKind.custom)
-            }
-
             TextField("Name", text: $key)
-
-            if kind == .color {
-                ColorPicker("Color", selection: Binding(get: { Color(hex: value) ?? .white }, set: { value = $0.toHex(includeAlpha: false) ?? "" }))
-            } else {
-                TextField("Valeur", text: $value)
-            }
-        }
-        .onChange(of: kind) { _, newValue in
-            key   = ""
-            value = ""
+            TextField("Valeur", text: $value)
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Save") {
-                    variant.attributes.append(ProductVariantAttribute(variant: variant, kind: kind, key: key, value: value))
+//                    variant.attributes.append(ProductVariantAttribute(variant: variant, kind: kind, key: key, value: value))
                     dismiss()
                 }
             }

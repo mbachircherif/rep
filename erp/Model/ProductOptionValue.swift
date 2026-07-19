@@ -12,14 +12,14 @@ final class ProductOptionValue {
 
     #Unique<ProductOptionValue>([\.option, \.name])
 
-    var option: ProductOption
+    var option: ProductOption?
 
     var name: String
 
-    @Relationship(deleteRule: .cascade, inverse: \ProductVariantAttribute.value)
+    @Relationship(deleteRule: .cascade, inverse: \ProductVariantAttribute.optionValue)
     var variantAttributes: [ProductVariantAttribute] = []
 
-    init(option: ProductOption, name: String) {
+    init(option: ProductOption, name: String = "") {
         self.option = option
         self.name = name
     }

@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class ProductVariant: Variant {
+final class ProductVariant {
 
     @Attribute(.unique)
     var sku: String

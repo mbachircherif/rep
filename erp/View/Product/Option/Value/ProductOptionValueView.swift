@@ -24,24 +24,8 @@ struct ProductOptionValueView: View {
                 Text("Détail")
             }
         }
-        .toolbar {
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                Button("Update") {
-                    // TODO: Make bulk update easier.
-                    for variant in value.option.product.variants {
-                        for attribute in variant.attributes {
-                            if attribute.name == value.option.name {
-                                if attribute.name == value.name {
-                                    attribute.name = value.name
-                                }
-                            }
-                        }
-                    }
-
-                    try? modelContext.save()
-                }
-                .disabled(!modelContext.hasChanges)
-            }
+        .onAppear {
+            print("INTERNAL FORM MODEL CONTEXT: \(Unmanaged.passUnretained(modelContext).toOpaque())")
         }
     }
 }
