@@ -23,12 +23,13 @@ struct ProductView: View {
     private var productVariantCreateFormPresented: Bool = false
 
     @State
-    private var productOptionCreateFormPresented: Bool = false
-
-    @State
     private var productOptionToCreate: ProductOption?
 
     var product: Product
+
+    var optionsPreview: [ProductOption] {
+        Array(product.options.prefix(5))
+    }
 
     var body: some View {
         List {
@@ -40,21 +41,19 @@ struct ProductView: View {
             }
 
             Section {
-                ForEach(product.options) { option in
-                    NavigationLink {
-                        FetchModelView(type: ProductOption.self, id: option.id, container: modelContext.container) { option in
-                            ProductOptionView(option: option)
-                        }
-                    } label: {
-                        Text(option.name)
-                    }
-                }
-
-                Button("Ajouter une option") {
-                    productOptionToCreate = ProductOption(product: product)
+                ForEach(optionsPreview) { option in
+                    Text(option.name)
                 }
             } header: {
-                Text("Options")
+                HStack {
+                    Text("Options")
+
+                    Spacer()
+
+                    NavigationLink("Voir tout") {
+                        ProductOptionList(product: product)
+                    }
+                }
             }
 
             Section {
@@ -77,11 +76,6 @@ struct ProductView: View {
         }
         .onAppear {
             print("MAIN ACTOR MODEL CONTEXT: \(Unmanaged.passUnretained(modelContext).toOpaque())")
-        }
-        .sheet(item: $productOptionToCreate) { productOption in
-            NavigationStack {
-                ProductOptionCreateFormView(option: productOption)
-            }
         }
         .sheet(isPresented: $productVariantCreateFormPresented) {
             NavigationStack {

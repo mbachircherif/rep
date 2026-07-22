@@ -12,7 +12,7 @@ final class ProductOption {
 
     #Unique<ProductOption>([\.product, \.name])
 
-    var product: Product
+    var product: Product?
 
     var name: String
 

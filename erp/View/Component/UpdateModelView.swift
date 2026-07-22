@@ -58,10 +58,10 @@ struct FetchModelView<T, Content>: View where T : PersistentModel, Content : Vie
 
     let id: PersistentIdentifier
 
-    let content: (T) -> Content
+    let content: (T, ModelContext) -> Content
 
     // TODO: The ModelContext building must be decorelated from this view. Put that logic outside.
-    init(type: T.Type, id: PersistentIdentifier, container: ModelContainer, @ViewBuilder content: @escaping (T) -> Content) {
+    init(type: T.Type, id: PersistentIdentifier, container: ModelContainer, @ViewBuilder content: @escaping (T, ModelContext) -> Content) {
         self.type = type
         self._modelContext = State(wrappedValue: ModelContext(container, autosave: false))
         self.id = id
@@ -84,8 +84,7 @@ struct FetchModelView<T, Content>: View where T : PersistentModel, Content : Vie
                     }
                 }
         case .success(.some(let model)):
-            content(model)
-                .environment(\.modelContext, modelContext)
+            content(model, modelContext)
         case .success(.none), .failure:
             ContentUnavailableView {
                 Label("Not found", systemImage: "exclamationmark.magnifyingglass")

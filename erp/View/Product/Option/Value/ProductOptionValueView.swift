@@ -24,9 +24,6 @@ struct ProductOptionValueView: View {
                 Text("Détail")
             }
         }
-        .onAppear {
-            print("INTERNAL FORM MODEL CONTEXT: \(Unmanaged.passUnretained(modelContext).toOpaque())")
-        }
     }
 }
 

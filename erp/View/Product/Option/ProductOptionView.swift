@@ -10,13 +10,20 @@ import SwiftUI
 
 struct ProductOptionView: View {
 
+    @Environment(\.dismiss)
+    private var dismiss
+
     @Environment(\.modelContext)
     private var modelContext
 
     @State
-    private var optionValueToCreate: ProductOptionValue?
+    private var optionToUpdate: ProductOption?
 
     var option: ProductOption
+
+    private var valuesPreview: [ProductOptionValue] {
+        Array(option.values.prefix(5))
+    }
 
     var body: some View {
         List {
@@ -27,59 +34,50 @@ struct ProductOptionView: View {
             }
 
             Section {
-                ForEach(option.values.enumerated(), id: \.element) { index, value in
-                    HStack {
+                ForEach(valuesPreview) { value in
+                    NavigationLink {
+                        ProductOptionValueView(value: value)
+                    } label: {
                         Text(value.name)
-
-                        Spacer()
-
-                        Menu {
-                            NavigationLink {
-                                ProductOptionValueView(value: value)
-                                    .environment(\.modelContext, modelContext)
-                            } label: {
-                                Label("Modifier", systemImage: "pencil")
-                            }
-
-                            Divider()
-
-                            Button(role: .destructive) {
-                                option.values.remove(at: index)
-                            } label: {
-                                Label("Supprimer", systemImage: "trash")
-                            }
-                        } label: {
-                            Image(systemName: "ellipsis")
-                        }
-                        .containerShape(.rect)
                     }
                 }
+            } header: {
+                HStack {
+                    Text("Valeurs")
 
-                Button("Ajouter une valeur") {
-                    optionValueToCreate = ProductOptionValue(option: option)
+                    Spacer()
+
+                    NavigationLink {
+                        
+                    } label: {
+                        Text("Voir tout")
+                    }
+                }
+            }
+
+            Section {
+                Button("Supprimer", role: .destructive) {
+                    delete()
                 }
             }
         }
-        .sheet(item: $optionValueToCreate) { optionValue in
-            NavigationStack {
-                ProductOptionValueCreateFormView(value: optionValue)
-            }
+        .sheet(item: $optionToUpdate) { option in
+            ProductOptionUpdateForm(option: option)
         }
         .toolbar {
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                Button("Sauvegarder") {
-                    update()
+            ToolbarItemGroup(placement: .primaryAction) {
+                Button {
+                    optionToUpdate = option
+                } label: {
+                    Image(systemName: "pencil")
                 }
-                .disabled(!modelContext.hasChanges)
             }
         }
     }
 
-    private func update() {
-        do {
-            try modelContext.save()
-        } catch {
-            print(error.localizedDescription)
-        }
+    private func delete() {
+        option.product?.options.removeAll { $0.id == option.id }
+        try? modelContext.save()
+        dismiss()
     }
 }
