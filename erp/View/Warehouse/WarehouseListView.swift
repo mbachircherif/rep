@@ -19,16 +19,41 @@ struct WarehouseListView: View {
     var warehouses: [Warehouse]
 
     var body: some View {
-        List {
-            Section {
+        ScrollView(.vertical) {
+            LazyVGrid(columns: Array(repeating: GridItem(), count: 2)) {
                 ForEach(warehouses) { warehouse in
                     NavigationLink {
                         WarehouseView(warehouse: warehouse)
                     } label: {
-                        Text(warehouse.name)
+                        // TODO: Extract.
+                        VStack(alignment: .leading, spacing: 4.0) {
+                            Image("nike")
+                                .resizable()
+                                .renderingMode(.template)
+                                .foregroundStyle(.white)
+                                .scaledToFit()
+                                .frame(width: 30.0, height: 30.0)
+
+                            Spacer()
+
+                            Text(warehouse.name)
+                                .font(.system(size: 16.0, weight: .medium, design: .rounded))
+                                .foregroundStyle(.white)
+
+                            Text("\(warehouse.products.count, format: .number) produits")
+                                .font(.system(size: 16.0, weight: .regular, design: .default))
+                                .foregroundStyle(.white.secondary)
+                        }
+                        .aspectRatio(4/3, contentMode: .fit)
+                        .frame(maxWidth: .infinity, alignment: .topLeading)
+                        .padding()
+                        .background(.black, in: .containerRelative)
                     }
+                    .buttonStyle(.plain)
                 }
             }
+            .containerShape(.rect(cornerRadius: 16.0))
+            .padding()
         }
         .sheet(item: $warehouseToCreate) { warehouse in
             NavigationStack {

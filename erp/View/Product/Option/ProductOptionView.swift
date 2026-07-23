@@ -34,32 +34,24 @@ struct ProductOptionView: View {
             }
 
             Section {
-                ForEach(valuesPreview) { value in
-                    NavigationLink {
-                        ProductOptionValueView(value: value)
-                    } label: {
-                        Text(value.name)
-                    }
-                }
-            } header: {
-                HStack {
-                    Text("Valeurs")
-
-                    Spacer()
-
-                    NavigationLink {
-                        
-                    } label: {
-                        Text("Voir tout")
+                NavigationLink {
+                    ProductOptionValueList(option: option)
+                } label: {
+                    LabeledContent("Valeurs") {
+                        Text(option.values.count, format: .number)
                     }
                 }
             }
 
-            Section {
-                Button("Supprimer", role: .destructive) {
-                    delete()
-                }
+            Button {
+                delete()
+            } label: {
+                Text("Supprimer")
+                    .font(.system(size: 18.0, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
             }
+            .frame(maxWidth: .infinity)
+            .listRowBackground(Color.red)
         }
         .sheet(item: $optionToUpdate) { option in
             ProductOptionUpdateForm(option: option)
@@ -73,6 +65,8 @@ struct ProductOptionView: View {
                 }
             }
         }
+        .navigationTitle(option.name)
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     private func delete() {

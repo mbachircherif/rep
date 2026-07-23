@@ -1,14 +1,14 @@
 //
-//  ProductOptionCreateForm.swift
+//  ProductOptionValueCreateForm.swift
 //  erp
 //
-//  Created by Mohamed BACHIR-CHERIF on 18/07/2026.
+//  Created by Mohamed BACHIR-CHERIF on 23/07/2026.
 //
 
 import SwiftData
 import SwiftUI
 
-struct ProductOptionCreateForm: View {
+struct ProductOptionValueCreateForm: View {
 
     @Environment(\.modelContext)
     private var modelContext
@@ -19,12 +19,12 @@ struct ProductOptionCreateForm: View {
     @State
     private var name: String
 
-    private let option: ProductOption
+    private let value: ProductOptionValue
 
-    init(option: ProductOption) {
-        self._name = State(wrappedValue: option.name)
+    init(value: ProductOptionValue) {
+        self._name = State(wrappedValue: value.name)
 
-        self.option = option
+        self.value = value
     }
 
     var body: some View {
@@ -52,8 +52,8 @@ struct ProductOptionCreateForm: View {
 
     private func create() {
         // Check form
-        option.name = name
-        option.product?.options.append(option)
+        value.name = name
+        value.option?.values.append(value)
         try? modelContext.save()
         dismiss()
     }

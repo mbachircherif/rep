@@ -36,5 +36,7 @@ struct ProductOptionList: View {
                 }
             }
         }
+        .navigationTitle("Options")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

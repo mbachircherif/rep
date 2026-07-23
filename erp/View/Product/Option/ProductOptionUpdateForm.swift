@@ -46,6 +46,8 @@ struct ProductOptionUpdateForm: View {
                     .disabled(option.name == name)
                 }
             }
+            .navigationTitle("Édition")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 
