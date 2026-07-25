@@ -25,11 +25,11 @@ final class ProductVariantAttribute {
 
     var variant: ProductVariant
 
-    var optionValue: ProductOptionValue
+    var optionValue: ProductOptionValue?
 
     var position: Int
 
-    init(variant: ProductVariant, optionValue: ProductOptionValue, position: Int) {
+    init(variant: ProductVariant, optionValue: ProductOptionValue?, position: Int) {
         self.variant     = variant
         self.optionValue = optionValue
         self.position    = position

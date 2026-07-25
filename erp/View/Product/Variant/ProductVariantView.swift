@@ -29,7 +29,7 @@ struct ProductVariantView: View {
             Section {
                 ForEach(variant.attributes.enumerated(), id: \.element) { index, attribute in
                     HStack(spacing: 24.0) {
-                        Text(attribute.optionValue.name)
+                        Text(attribute.optionValue?.name ?? "Unknown")
 
                         Spacer()
 

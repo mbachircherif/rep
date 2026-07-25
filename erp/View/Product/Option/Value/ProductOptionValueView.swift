@@ -67,7 +67,7 @@ struct ProductOptionValueView: View {
                 // Remove the option value in all variants
                 for (index, variant) in product.variants.enumerated() {
                     // Remove the corresponding varaint attribute
-                    variant.attributes.removeAll { $0.optionValue.name == value.name }
+                    variant.attributes.removeAll { $0.optionValue?.name == value.name }
 
                     // If it was the last attribute, delete the variant
                     if variant.attributes.isEmpty {

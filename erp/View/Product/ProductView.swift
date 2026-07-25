@@ -27,13 +27,8 @@ struct ProductView: View {
 
     var product: Product
 
-    private var positionSortedVariant: [ProductVariant] {
-        product.variants.sorted { $0.position < $1.position }
-    }
-
     var body: some View {
         List {
-
             Section {
                 LabeledContent("Nom", value: product.name)
             } header: {
@@ -49,24 +44,13 @@ struct ProductView: View {
             }
 
             Section {
-                ForEach(positionSortedVariant) { variant in
-                    NavigationLink {
-                        ProductVariantView(variant: variant)
-                    } label: {
-                        HStack {
-                            let sortedAttributes = variant.attributes.sorted(by: { $0.position < $1.position })
-
-                            Text(sortedAttributes.map(\.optionValue.name).joined(separator: "/"))
-
-                            Spacer()
-
-                            // TODO: Provide a default currency based on Locale
-                            Text(variant.sellingPrice, format: .currency(code: product.warehouse?.currency.rawValue ?? "EUR"))
-                        }
-                    }
+                NavigationLink {
+                    ProductVariantList(product: product)
+                } label: {
+                    LabeledContent("Variants", value: product.variants.count, format: .number)
                 }
-            } header: {
-                Text("Variants")
+            } footer: {
+                Text("Les variantes sont générées automatiquement à partir des options du produit.")
             }
         }
         .toolbar {
@@ -87,11 +71,6 @@ struct ProductView: View {
                             }
                         }
                     }
-            }
-        }
-        .onAppear {
-            for variant in positionSortedVariant {
-                print(variant.position)
             }
         }
     }
