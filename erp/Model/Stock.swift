@@ -9,7 +9,7 @@ import Foundation
 
 struct Stock: Codable, Hashable {
 
-    var amount: Decimal = 0
+    var amount: Decimal
 
-    var unit: Unit = .quantity
+    var unit: Unit
 }

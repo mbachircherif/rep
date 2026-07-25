@@ -56,8 +56,33 @@ struct ProductOptionValueView: View {
     }
 
     private func delete() {
-        value.option?.values.removeAll { $0.id == value.id }
-        try? modelContext.save()
-        dismiss()
+        do {
+            let option  = value.option
+            let product = option?.product
+
+            if let option, let product {
+                // Remove the value from option values
+                option.values.removeAll { $0.id == value.id }
+
+                // Remove the option value in all variants
+                for (index, variant) in product.variants.enumerated() {
+                    // Remove the corresponding varaint attribute
+                    variant.attributes.removeAll { $0.optionValue.name == value.name }
+
+                    // If it was the last attribute, delete the variant
+                    if variant.attributes.isEmpty {
+                        product.variants.remove(at: index)
+                    }
+                }
+            }
+
+            if modelContext.hasChanges {
+                try modelContext.save()
+            }
+
+            dismiss()
+        } catch {
+            print(error.localizedDescription)
+        }
     }
 }

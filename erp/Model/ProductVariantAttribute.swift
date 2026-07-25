@@ -27,8 +27,22 @@ final class ProductVariantAttribute {
 
     var optionValue: ProductOptionValue
 
-    init(variant: ProductVariant, optionValue: ProductOptionValue) {
-        self.variant = variant
-        self.optionValue   = optionValue
+    var position: Int
+
+    init(variant: ProductVariant, optionValue: ProductOptionValue, position: Int) {
+        self.variant     = variant
+        self.optionValue = optionValue
+        self.position    = position
+    }
+}
+
+extension ProductVariantAttribute {
+
+    func copy() -> ProductVariantAttribute {
+        ProductVariantAttribute(
+            variant     : variant,
+            optionValue : optionValue,
+            position    : position
+        )
     }
 }

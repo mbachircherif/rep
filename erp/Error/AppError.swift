@@ -10,4 +10,6 @@ import SwiftData
 enum AppError: Error {
 
     case modelNotFound(PersistentIdentifier)
+
+    case duplicatedEntry
 }

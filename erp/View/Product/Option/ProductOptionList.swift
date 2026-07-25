@@ -14,9 +14,13 @@ struct ProductOptionList: View {
 
     var product: Product
 
+    private var positionSortedOptions: [ProductOption] {
+        product.options.sorted { $0.position < $1.position }
+    }
+
     var body: some View {
         List {
-            ForEach(product.options) { option in
+            ForEach(positionSortedOptions) { option in
                 NavigationLink {
                     ProductOptionView(option: option)
                 } label: {
@@ -30,7 +34,7 @@ struct ProductOptionList: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
-                    optionToCreate = ProductOption(product: product)
+                    optionToCreate = ProductOption(product: product, position: product.options.count)
                 } label: {
                     Image(systemName: "plus")
                 }

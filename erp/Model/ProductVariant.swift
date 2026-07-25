@@ -11,10 +11,11 @@ import SwiftData
 @Model
 final class ProductVariant {
 
-    @Attribute(.unique)
     var sku: String
 
     var product: Product
+
+    var position: Int
 
     @Relationship(deleteRule: .cascade, inverse: \ProductVariantAttribute.variant)
     var attributes: [ProductVariantAttribute] = []
@@ -27,14 +28,24 @@ final class ProductVariant {
 
     var tax: Tax
 
-    init(sku: String, product: Product, attributes: [ProductVariantAttribute], costPrice: Decimal, sellingPrice: Decimal, tax: Tax, stock: Stock) {
-        self.sku = sku
-        self.product = product
-        self.attributes = attributes
-        self.costPrice = costPrice
+    init(
+        sku: String = "",
+        product: Product,
+        position: Int,
+        attributes: [ProductVariantAttribute] = [],
+        costPrice: Decimal = 0,
+        sellingPrice: Decimal = 0,
+        tax: Tax = Tax(rate: 0, behavior: .inclusive),
+        stock: Stock = Stock(amount: 0, unit: .quantity)
+    ) {
+        self.sku          = sku
+        self.product      = product
+        self.position     = position
+        self.attributes   = attributes
+        self.costPrice    = costPrice
         self.sellingPrice = sellingPrice
-        self.tax = tax
-        self.stock = stock
+        self.tax          = tax
+        self.stock        = stock
     }
 }
 
@@ -49,5 +60,21 @@ extension ProductVariant: Hashable {
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(sku)
+    }
+}
+
+extension ProductVariant {
+
+    func copy() -> ProductVariant {
+        ProductVariant(
+            sku          : sku,
+            product      : product,
+            position     : position,
+            attributes   : attributes.map { $0.copy() },
+            costPrice    : costPrice,
+            sellingPrice : sellingPrice,
+            tax          : tax,
+            stock        : stock
+        )
     }
 }

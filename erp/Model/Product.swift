@@ -11,7 +11,7 @@ import SwiftData
 @Model
 final class Product {
 
-    var warehouse: Warehouse
+    var warehouse: Warehouse?
 
     @Attribute(.unique)
     var name: String

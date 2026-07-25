@@ -27,8 +27,8 @@ struct ProductView: View {
 
     var product: Product
 
-    var optionsPreview: [ProductOption] {
-        Array(product.options.prefix(5))
+    private var positionSortedVariant: [ProductVariant] {
+        product.variants.sorted { $0.position < $1.position }
     }
 
     var body: some View {
@@ -41,32 +41,27 @@ struct ProductView: View {
             }
 
             Section {
-                ForEach(optionsPreview) { option in
-                    Text(option.name)
-                }
-            } header: {
-                HStack {
-                    Text("Options")
-
-                    Spacer()
-
-                    NavigationLink("Voir tout") {
-                        ProductOptionList(product: product)
-                    }
+                NavigationLink {
+                    ProductOptionList(product: product)
+                } label: {
+                    LabeledContent("Options", value: product.options.count, format: .number)
                 }
             }
 
             Section {
-                ForEach(product.variants) { variant in
+                ForEach(positionSortedVariant) { variant in
                     NavigationLink {
                         ProductVariantView(variant: variant)
                     } label: {
                         HStack {
-                            Text(variant.sku)
+                            let sortedAttributes = variant.attributes.sorted(by: { $0.position < $1.position })
+
+                            Text(sortedAttributes.map(\.optionValue.name).joined(separator: "/"))
 
                             Spacer()
 
-                            Text(variant.sellingPrice, format: .currency(code: product.warehouse.currency.rawValue))
+                            // TODO: Provide a default currency based on Locale
+                            Text(variant.sellingPrice, format: .currency(code: product.warehouse?.currency.rawValue ?? "EUR"))
                         }
                     }
                 }
@@ -74,8 +69,13 @@ struct ProductView: View {
                 Text("Variants")
             }
         }
-        .onAppear {
-            print("MAIN ACTOR MODEL CONTEXT: \(Unmanaged.passUnretained(modelContext).toOpaque())")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button(role: .destructive) {
+                    product.warehouse?.products.removeAll { $0.name == product.name }
+                    try? modelContext.save()
+                }
+            }
         }
         .sheet(isPresented: $productVariantCreateFormPresented) {
             NavigationStack {
@@ -87,6 +87,11 @@ struct ProductView: View {
                             }
                         }
                     }
+            }
+        }
+        .onAppear {
+            for variant in positionSortedVariant {
+                print(variant.position)
             }
         }
     }

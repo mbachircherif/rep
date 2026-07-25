@@ -16,11 +16,14 @@ final class ProductOption {
 
     var name: String
 
+    var position: Int
+
     @Relationship(deleteRule: .cascade, inverse: \ProductOptionValue.option)
     var values: [ProductOptionValue] = []
 
-    init(product: Product, name: String = "") {
+    init(product: Product, name: String = "", position: Int) {
         self.product = product
         self.name = name
+        self.position = position
     }
 }

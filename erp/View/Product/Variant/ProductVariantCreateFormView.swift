@@ -25,7 +25,7 @@ struct ProductVariantCreateFormView: View {
     private var tax: Tax = Tax(rate: 0.0, behavior: .inclusive)
 
     @State
-    private var stock: Stock = Stock()
+    private var stock: Stock = Stock(amount: 0, unit: .quantity)
 
     var product: Product
 
@@ -38,13 +38,15 @@ struct ProductVariantCreateFormView: View {
 
             Section {
                 LabeledContent("Prix de revient") {
-                    TextField("", value: $costPrice, format: .currency(code: product.warehouse.currency.rawValue))
+                    // TODO: Provide a default currency based on Locale
+                    TextField("", value: $costPrice, format: .currency(code: product.warehouse?.currency.rawValue ?? "EUR"))
                         .keyboardType(.decimalPad)
                         .multilineTextAlignment(.trailing)
                 }
 
                 LabeledContent("Prix de vente") {
-                    TextField("", value: $sellingPrice, format: .currency(code: product.warehouse.currency.rawValue))
+                    // TODO: Provide a default currency based on Locale
+                    TextField("", value: $sellingPrice, format: .currency(code: product.warehouse?.currency.rawValue ?? "EUR"))
                         .keyboardType(.decimalPad)
                         .multilineTextAlignment(.trailing)
                 }
@@ -78,15 +80,6 @@ struct ProductVariantCreateFormView: View {
                 }
             } header: {
                 Text("Stock")
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button("Ajouter") {
-                    product.variants.append(ProductVariant(sku: sku, product: product, attributes: [], costPrice: costPrice, sellingPrice: sellingPrice, tax: tax, stock: stock))
-                    dismiss()
-                }
-                .buttonStyle(.glassProminent)
             }
         }
     }
