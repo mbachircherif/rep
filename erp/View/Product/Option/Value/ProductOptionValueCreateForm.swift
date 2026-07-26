@@ -90,9 +90,15 @@ struct ProductOptionValueCreateForm: View {
                     /// Thus, we keep the exiting variant without deleting and creating a new one.
                     ///
 
+                    /// If the newly option value is the only existing value in the option:
+                    /// - option position = first --> Prepend
+                    /// - option position = last --> Append
+                    /// - option position = n     --> Insert
+
+                    /// Add to documentation:
+                    /// /!\ - The position of `ProductVariantAttribute` should be the same as its `ProdutOptionValue`'s option position.
                     for variant in product.variants {
                         let attribute = ProductVariantAttribute(variant: variant, optionValue: value, position: option.position)
-
                         variant.attributes.append(attribute)
                     }
                 } else {

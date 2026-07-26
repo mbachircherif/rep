@@ -71,11 +71,11 @@ struct ProductOptionValueView: View {
                     for variant in product.variants {
 
                         let variantID: PersistentIdentifier = variant.id
+                        let productOptionPosition: Int = option.position
 
                         var lastProductVariantAttributeFetchDescriptor = FetchDescriptor<ProductVariantAttribute>()
 
-                        lastProductVariantAttributeFetchDescriptor.predicate = #Predicate { $0.variant?.persistentModelID == variantID }
-                        lastProductVariantAttributeFetchDescriptor.sortBy = [SortDescriptor(\.position, order: .reverse)]
+                        lastProductVariantAttributeFetchDescriptor.predicate = #Predicate { $0.variant?.persistentModelID == variantID && $0.position == productOptionPosition }
                         lastProductVariantAttributeFetchDescriptor.fetchLimit = 1
 
                         let lastProductVariantAttribute: ProductVariantAttribute? = try modelContext.fetch(lastProductVariantAttributeFetchDescriptor).first
@@ -86,8 +86,8 @@ struct ProductOptionValueView: View {
                     }
                 } else {
                     for attribute in value.variantAttributes {
-                        if let attributeVariant = attribute.variant {
-                            modelContext.delete(attributeVariant)
+                        if let variant = attribute.variant {
+                            modelContext.delete(variant)
                         }
                     }
                 }
