@@ -11,6 +11,8 @@ import SwiftData
 @Model
 final class ProductVariantAttribute {
 
+    #Index<ProductVariantAttribute>([\.variant, \.position])
+
     /// A variant attribute pairs a `ProductOption` with one of its `ProductOptionValue`s
     /// (e.g. Size → 1kg).
     ///
@@ -23,13 +25,13 @@ final class ProductVariantAttribute {
 
     #Unique<ProductVariantAttribute>([\.variant, \.optionValue])
 
-    var variant: ProductVariant
+    var variant: ProductVariant?
 
     var optionValue: ProductOptionValue?
 
     var position: Int
 
-    init(variant: ProductVariant, optionValue: ProductOptionValue?, position: Int) {
+    init(variant: ProductVariant?, optionValue: ProductOptionValue?, position: Int) {
         self.variant     = variant
         self.optionValue = optionValue
         self.position    = position

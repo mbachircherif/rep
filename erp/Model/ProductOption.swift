@@ -10,6 +10,8 @@ import SwiftData
 @Model
 final class ProductOption {
 
+    #Index<ProductOption>([\.product, \.position])
+
     #Unique<ProductOption>([\.product, \.name])
 
     var product: Product?

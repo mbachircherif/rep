@@ -51,11 +51,31 @@ struct ProductOptionCreateForm: View {
     }
 
     private func create() {
-        // Check form
-        option.name = name
-        option.product?.options.append(option)
-        try? modelContext.save()
-        dismiss()
+        do {
+            if let product = option.product {
+                // Check form
+
+                let productID: PersistentIdentifier = product.id
+
+                var lastProductOptionFetchDescriptor = FetchDescriptor<ProductOption>()
+
+                lastProductOptionFetchDescriptor.predicate = #Predicate { $0.product?.persistentModelID == productID }
+                lastProductOptionFetchDescriptor.sortBy = [SortDescriptor(\.position, order: .reverse)]
+                lastProductOptionFetchDescriptor.fetchLimit = 1
+
+                let lastProductVariantPosition: Int = try modelContext.fetch(lastProductOptionFetchDescriptor).first?.position ?? 0
+
+                option.name = name
+                option.position = lastProductVariantPosition + 1
+
+                option.product?.options.append(option)
+                try modelContext.save()
+            }
+
+            dismiss()
+        } catch {
+            print(error.localizedDescription)
+        }
     }
 
     private func cancel() {

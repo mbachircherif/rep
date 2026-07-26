@@ -11,9 +11,17 @@ import SwiftData
 @Model
 final class ProductVariant {
 
+    /// Indexing  on (product, position) is a list that groups by product and sort by position:
+    /// (ProductA, 1) → row 47
+    /// (ProductA, 2) → row 12
+    /// (ProductA, 3) → row 88
+    /// (ProductB, 1) → row 03
+    /// (ProductB, 2) → row 51
+    #Index<ProductVariant>([\.product, \.position])
+
     var sku: String
 
-    var product: Product
+    var product: Product?
 
     var position: Int
 
@@ -30,7 +38,7 @@ final class ProductVariant {
 
     init(
         sku: String = "",
-        product: Product,
+        product: Product?,
         position: Int,
         attributes: [ProductVariantAttribute] = [],
         costPrice: Decimal = 0,

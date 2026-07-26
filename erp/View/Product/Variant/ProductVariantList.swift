@@ -24,18 +24,7 @@ struct ProductVariantList: View {
                 } description: {
                     Text("Commencez par ajouter des options pour créer de nouveaux variants.")
                         .fontDesign(.rounded)
-                } actions: {
-                    Button {
-
-                    } label: {
-                        Text("Ajouter")
-                            .fontWeight(.bold)
-                            .fontDesign(.rounded)
-                    }
-                    .buttonStyle(.glassProminent)
-                    .controlSize(.regular)
                 }
-
             } else {
                 List {
                     ForEach(positionSortedVariants) { variant in
@@ -51,6 +40,11 @@ struct ProductVariantList: View {
                         }
                     }
                 }
+            }
+        }
+        .onAppear {
+            for positionSortedVariant in positionSortedVariants {
+                print("POSITION \(positionSortedVariant.position)")
             }
         }
         .navigationTitle("Variantes")

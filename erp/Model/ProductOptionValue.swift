@@ -10,6 +10,8 @@ import SwiftData
 @Model
 final class ProductOptionValue {
 
+    #Index<ProductOptionValue>([\.option, \.position])
+
     var option: ProductOption?
 
     var name: String

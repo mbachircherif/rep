@@ -61,17 +61,34 @@ struct ProductOptionValueView: View {
             let product = option?.product
 
             if let option, let product {
-                // Remove the value from option values
-                option.values.removeAll { $0.id == value.id }
 
-                // Remove the option value in all variants
-                for (index, variant) in product.variants.enumerated() {
-                    // Remove the corresponding varaint attribute
-                    variant.attributes.removeAll { $0.optionValue?.name == value.name }
+                modelContext.delete(value)
 
-                    // If it was the last attribute, delete the variant
-                    if variant.attributes.isEmpty {
-                        product.variants.remove(at: index)
+                let nonEmptyOptions = product.options.filter { !$0.values.isEmpty }
+
+                if nonEmptyOptions.count > 1 && option.values.count == 1 {
+                    /// We just removing leafs, so no variants deletion.
+                    for variant in product.variants {
+
+                        let variantID: PersistentIdentifier = variant.id
+
+                        var lastProductVariantAttributeFetchDescriptor = FetchDescriptor<ProductVariantAttribute>()
+
+                        lastProductVariantAttributeFetchDescriptor.predicate = #Predicate { $0.variant?.persistentModelID == variantID }
+                        lastProductVariantAttributeFetchDescriptor.sortBy = [SortDescriptor(\.position, order: .reverse)]
+                        lastProductVariantAttributeFetchDescriptor.fetchLimit = 1
+
+                        let lastProductVariantAttribute: ProductVariantAttribute? = try modelContext.fetch(lastProductVariantAttributeFetchDescriptor).first
+
+                        if let lastProductVariantAttribute {
+                            modelContext.delete(lastProductVariantAttribute)
+                        }
+                    }
+                } else {
+                    for attribute in value.variantAttributes {
+                        if let attributeVariant = attribute.variant {
+                            modelContext.delete(attributeVariant)
+                        }
                     }
                 }
             }

@@ -63,6 +63,7 @@ struct ProductOptionValueCreateForm: View {
         }
     }
 
+    // TODO: Execute this in background thread.
     private func create() {
         do {
             if let option = value.option, let product = option.product {
@@ -75,6 +76,7 @@ struct ProductOptionValueCreateForm: View {
                 value.name = name.value
                 
                 /// Add value to option values
+                // TODO: Use modelContext.insert(_:) ?
                 option.values.append(value)
 
                 let nonEmptyOptions = product.options.filter { !$0.values.isEmpty }
@@ -89,8 +91,7 @@ struct ProductOptionValueCreateForm: View {
                     ///
 
                     for variant in product.variants {
-                        let attributePosition = variant.attributes.count
-                        let attribute = ProductVariantAttribute(variant: variant, optionValue: value, position: attributePosition)
+                        let attribute = ProductVariantAttribute(variant: variant, optionValue: value, position: option.position)
 
                         variant.attributes.append(attribute)
                     }
@@ -111,29 +112,39 @@ struct ProductOptionValueCreateForm: View {
                     /// - [M- Green]
                     ///
 
+                    let productID: PersistentIdentifier = product.id
                     /// Tree options is reversed.
-                    let productOptions        = product.options.sorted { $0.position > $1.position }
-                    let productOptionsCount   = productOptions.count
-                    let productOptionPosition = (productOptionsCount - 1) - option.position
+                    let productOptions:        [ProductOption] = product.options.sorted { $0.position > $1.position }
+                    let productOptionsCount:   Int             = productOptions.count
+                    let productOptionPosition: Int             = productOptionsCount - (option.position - 1)
 
-                    let newOptionValues = [value]
-                    
-                    func createVariantCombinations(values: [ProductOptionValue], depth: Int) {
+                    var lastProductVariantFetchDescriptor = FetchDescriptor<ProductVariant>()
+                    lastProductVariantFetchDescriptor.predicate = #Predicate { $0.product?.persistentModelID == productID }
+                    lastProductVariantFetchDescriptor.sortBy = [SortDescriptor(\.position, order: .reverse)]
+                    lastProductVariantFetchDescriptor.fetchLimit = 1
+
+                    var lastProductVariantPosition: Int = try modelContext.fetch(lastProductVariantFetchDescriptor).first?.position ?? 0
+
+                    func createVariantCombinations(values: [(value: ProductOptionValue, position: Int)], depth: Int) throws {
                         // No more node to path. We reach a leaf of the option values tree.
                         if depth == productOptionsCount {
-                            let newProductVariant = ProductVariant(product: product, position: product.variants.count)
-
-                            let productOptionValueCount = values.count
+                            let newProductVariant = ProductVariant(product: product, position: lastProductVariantPosition + 1)
 
                             /// We fill the variant attributes in the reverse order as they stack since options are in the reversed the tree..
                             for index in values.indices {
-                                let productOptionValue = values[index]
-                                let productVariantAttribute = ProductVariantAttribute(variant: newProductVariant, optionValue: productOptionValue, position: productOptionValueCount - (index + 1))
+                                let productVariantAttributeProperties = values[index]
+
+                                let productVariantAttribute = ProductVariantAttribute(
+                                    variant:     newProductVariant,
+                                    optionValue: productVariantAttributeProperties.value,
+                                    position:    productVariantAttributeProperties.position
+                                )
 
                                 newProductVariant.attributes.append(productVariantAttribute)
                             }
 
                             product.variants.append(newProductVariant)
+                            lastProductVariantPosition += 1
                         } else {
                             /// The mental model is to picture the options as floors of a building, one option per floor:
                             /// - Floor 1: Size      [S, M]
@@ -141,7 +152,7 @@ struct ProductOptionValueCreateForm: View {
                             /// - Floor 3: Shape  [Square, Circle]
                             ///
                             /// Each recursive call descends one floor and picks the values of that floor's option, branching once per value.
-                            /// Reaching the ground floor (`depth == productOptionsCount`) means a full combination has been assembled, so a variant is created.
+                            /// Reaching the ground floor (`depth == productOptionsCount - 1`) means a full combination has been assembled, so a variant is created.
                             ///
                             /// The floor matching the new value's option is the exception: instead of iterating over its existing values,
                             /// we substitute the single new value, since only combinations that include it need to be generated.
@@ -149,24 +160,26 @@ struct ProductOptionValueCreateForm: View {
                             /// ex:
                             /// Inserting Size[L] with Size on floor 1. When `depth` reaches floor 1, we branch over [L] instead of [S, M].
 
-                            let productOptionsValue = if depth == productOptionPosition {
-                                newOptionValues
+                           if depth == productOptionPosition - 1 {
+                                try createVariantCombinations(values: values + [(value: value, position: option.position)], depth: depth + 1)
                             } else {
-                                productOptions[depth].values.sorted { $0.position < $1.position}
-                            }
+                                let productOption = productOptions[depth]
+                                // TODO: Replace by modelContext.fetch to take advantage of #Index
+                                let productOptionValues = productOption.values.sorted { $0.position < $1.position}
 
-                            /// Sometimes, option values can be empty because the user can create all its options before adding some values in them.
-                            if productOptionsValue.isEmpty {
-                                createVariantCombinations(values: values, depth: depth + 1)
-                            } else {
-                                for productOptionValue in productOptionsValue {
-                                    createVariantCombinations(values: values + [productOptionValue], depth: depth + 1)
+                                /// Sometimes, option values can be empty because the user can create all its options before adding some values in them.
+                                if productOptionValues.isEmpty {
+                                    try createVariantCombinations(values: values, depth: depth + 1)
+                                } else {
+                                    for productOptionValue in productOptionValues {
+                                        try createVariantCombinations(values: values + [(value: productOptionValue, position: productOption.position)], depth: depth + 1)
+                                    }
                                 }
                             }
                         }
                     }
 
-                    createVariantCombinations(values: [], depth: 0)
+                    try createVariantCombinations(values: [], depth: 0)
                 }
             }
 
