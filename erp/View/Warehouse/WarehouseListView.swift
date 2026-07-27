@@ -30,7 +30,7 @@ struct WarehouseListView: View {
                             Image("nike")
                                 .resizable()
                                 .renderingMode(.template)
-                                .foregroundStyle(.textPrimary)
+                                .foregroundStyle(.textPrimaryForeground)
                                 .scaledToFit()
                                 .frame(width: 30.0, height: 30.0)
 
@@ -38,7 +38,7 @@ struct WarehouseListView: View {
 
                             Text(warehouse.name)
                                 .font(.system(size: 16.0, weight: .medium, design: .rounded))
-                                .foregroundStyle(.textPrimary)
+                                .foregroundStyle(.textPrimaryForeground)
 
                             Text("\(warehouse.products.count, format: .number) produits")
                                 .font(.system(size: 16.0, weight: .regular, design: .default))

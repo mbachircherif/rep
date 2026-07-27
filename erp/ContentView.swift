@@ -76,7 +76,21 @@ struct ContentView: View {
         NavigationStack {
             WarehouseListView(warehouses: warehouses)
                 .onAppear {
-                    print("MAIN ACTOR MODEL CONTEXT: \(Unmanaged.passUnretained(modelContext).toOpaque())")
+                    let warehouse = Warehouse(name: "Nike")
+                    let product = Product(warehouse: warehouse, name: "Air Force 1")
+
+                    let option1 = ProductOption(product: product, name: "O1", position: 1)
+
+                    let option2 = ProductOption(product: product, name: "O2", position: 2)
+
+                    let option3 = ProductOption(product: product, name: "O3", position: 3)
+
+                    warehouse.products.append(product)
+                    product.options.append(contentsOf: [option1, option2, option3])
+
+                    modelContext.insert(warehouse)
+
+                    try? modelContext.save()
                 }
 
         }

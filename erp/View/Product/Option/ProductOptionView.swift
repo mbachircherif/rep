@@ -118,12 +118,14 @@ struct ProductOptionView: View {
                         /// | V4 [2,B] | [B]               | yes      | delete whole variant       |
 
                         var visitedAttributes: Set<[PersistentIdentifier]> = []
+                        var visitedDebugAttributes: Set<[String]> = []
 
                         for variant in try fetchProductVariants(for: product){
                             let variantAttributes: [ProductVariantAttribute] = try fetchProductVariantAttributes(for: variant, position: optionPosition)
 
                             // Loop over for variant attribute that not belong to the deleted option.
                             var path: [PersistentIdentifier] = []
+                            var debugPath: [String] = []
 
                             for attribute in variantAttributes {
                                 if attribute.optionValue?.option?.id == option.id {
@@ -131,15 +133,19 @@ struct ProductOptionView: View {
                                 } else {
                                     if let optionValueID = attribute.optionValue?.id {
                                         path.append(optionValueID)
+                                        debugPath.append(attribute.optionValue?.name ?? "N/A")
                                     }
                                 }
                             }
+
+                            print(debugPath, visitedDebugAttributes.contains(debugPath), visitedAttributes.contains(path))
 
                             if visitedAttributes.contains(path) {
                                 modelContext.delete(variant)
                             }
 
                             visitedAttributes.insert(path)
+                            visitedDebugAttributes.insert(debugPath)
                         }
                     }
                 }
@@ -161,6 +167,7 @@ struct ProductOptionView: View {
         var productVariantsFetchDescriptor = FetchDescriptor<ProductVariant>()
 
         productVariantsFetchDescriptor.predicate = #Predicate { $0.product?.persistentModelID == productID }
+        productVariantsFetchDescriptor.sortBy = [SortDescriptor(\.position)]
 
         return try modelContext.fetch(productVariantsFetchDescriptor)
     }

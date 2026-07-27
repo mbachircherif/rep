@@ -36,15 +36,11 @@ struct ProductVariantList: View {
                             Spacer()
 
                             // TODO: Provide a default currency based on Locale
-                            Text(variant.sellingPrice, format: .currency(code: product.warehouse?.currency.rawValue ?? "EUR"))
+                            Text(variant.position, format: .number)
+//                            Text(variant.sellingPrice, format: .currency(code: product.warehouse?.currency.rawValue ?? "EUR"))
                         }
                     }
                 }
-            }
-        }
-        .onAppear {
-            for positionSortedVariant in positionSortedVariants {
-                print("POSITION \(positionSortedVariant.position)")
             }
         }
         .navigationTitle("Variantes")
