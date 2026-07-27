@@ -23,7 +23,7 @@ struct ProductOptionValueCreateForm: View {
     private let value: ProductOptionValue
 
     init(value: ProductOptionValue) {
-        self._name = State(wrappedValue: Field(value: value.name, state: .idle))
+        self._name = State(wrappedValue: Field(value: value.name))
 
         self.value = value
     }
@@ -71,10 +71,10 @@ struct ProductOptionValueCreateForm: View {
                 guard option.values.contains(where: { $0.name == name.value }) == false else {
                     throw FieldError(field: "name", reason: "Valeur déjà ajoutée")
                 }
-                
+
                 /// Update value's fields
                 value.name = name.value
-                
+
                 /// Add value to option values
                 // TODO: Use modelContext.insert(_:) ?
                 option.values.append(value)
@@ -122,7 +122,6 @@ struct ProductOptionValueCreateForm: View {
                     /// Tree options is reversed.
                     let productOptions:        [ProductOption] = product.options.sorted { $0.position > $1.position }
                     let productOptionsCount:   Int             = productOptions.count
-                    let productOptionPosition: Int             = productOptionsCount - (option.position - 1)
 
                     var lastProductVariantFetchDescriptor = FetchDescriptor<ProductVariant>()
                     lastProductVariantFetchDescriptor.predicate = #Predicate { $0.product?.persistentModelID == productID }
@@ -149,6 +148,8 @@ struct ProductOptionValueCreateForm: View {
                                 newProductVariant.attributes.append(productVariantAttribute)
                             }
 
+                            newProductVariant.attributes.forEach { print("POSITION \($0.position)") }
+
                             product.variants.append(newProductVariant)
                             lastProductVariantPosition += 1
                         } else {
@@ -166,10 +167,11 @@ struct ProductOptionValueCreateForm: View {
                             /// ex:
                             /// Inserting Size[L] with Size on floor 1. When `depth` reaches floor 1, we branch over [L] instead of [S, M].
 
-                           if depth == productOptionPosition - 1 {
+                            let productOption = productOptions[depth]
+
+                            if productOption.id == option.id {
                                 try createVariantCombinations(values: values + [(value: value, position: option.position)], depth: depth + 1)
                             } else {
-                                let productOption = productOptions[depth]
                                 // TODO: Replace by modelContext.fetch to take advantage of #Index
                                 let productOptionValues = productOption.values.sorted { $0.position < $1.position}
 

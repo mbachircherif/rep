@@ -10,6 +10,11 @@ struct Field<T> {
     var value: T
 
     var state: State
+
+    init(value: T) {
+        self.value = value
+        self.state = .idle
+    }
 }
 
 extension Field {

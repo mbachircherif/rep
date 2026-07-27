@@ -62,8 +62,6 @@ struct ProductOptionValueView: View {
 
             if let option, let product {
 
-                modelContext.delete(value)
-
                 let nonEmptyOptions = product.options.filter { !$0.values.isEmpty }
 
                 if nonEmptyOptions.count > 1 && option.values.count == 1 {
@@ -71,11 +69,15 @@ struct ProductOptionValueView: View {
                     for variant in product.variants {
 
                         let variantID: PersistentIdentifier = variant.id
-                        let productOptionPosition: Int = option.position
+                        let optionPosition: Int = option.position
 
                         var lastProductVariantAttributeFetchDescriptor = FetchDescriptor<ProductVariantAttribute>()
 
-                        lastProductVariantAttributeFetchDescriptor.predicate = #Predicate { $0.variant?.persistentModelID == variantID && $0.position == productOptionPosition }
+                        lastProductVariantAttributeFetchDescriptor.predicate = #Predicate {
+                            $0.variant?.persistentModelID == variantID &&
+                            $0.position == optionPosition
+                        }
+
                         lastProductVariantAttributeFetchDescriptor.fetchLimit = 1
 
                         let lastProductVariantAttribute: ProductVariantAttribute? = try modelContext.fetch(lastProductVariantAttributeFetchDescriptor).first
@@ -91,6 +93,8 @@ struct ProductOptionValueView: View {
                         }
                     }
                 }
+
+                modelContext.delete(value)
             }
 
             if modelContext.hasChanges {

@@ -17,12 +17,12 @@ struct ProductOptionCreateForm: View {
     private var dismiss
 
     @State
-    private var name: String
+    private var name: Field<String>
 
     private let option: ProductOption
 
     init(option: ProductOption) {
-        self._name = State(wrappedValue: option.name)
+        self._name = State(wrappedValue: Field(value: option.name))
 
         self.option = option
     }
@@ -30,7 +30,16 @@ struct ProductOptionCreateForm: View {
     var body: some View {
         NavigationStack {
             Form {
-                TextField("Requis", text: $name)
+                Section {
+                    TextField("Requis", text: $name.value)
+                } header: {
+                    Text("Nom")
+                } footer: {
+                    if case let .error(reason) = name.state {
+                        Label(reason, systemImage: "exclamationmark.circle.fill")
+                            .foregroundStyle(.red)
+                    }
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -53,7 +62,12 @@ struct ProductOptionCreateForm: View {
     private func create() {
         do {
             if let product = option.product {
-                // Check form
+                // Options are genrally few (1 to 3 average).
+                // We can interact with product.options
+
+                guard product.options.contains(where: { $0.name == name.value }) == false else {
+                    throw FieldError(field: "name", reason: "Valeur déjà ajoutée")
+                }
 
                 let productID: PersistentIdentifier = product.id
 
@@ -65,7 +79,7 @@ struct ProductOptionCreateForm: View {
 
                 let lastProductVariantPosition: Int = try modelContext.fetch(lastProductOptionFetchDescriptor).first?.position ?? 0
 
-                option.name = name
+                option.name = name.value
                 option.position = lastProductVariantPosition + 1
 
                 option.product?.options.append(option)
@@ -73,6 +87,13 @@ struct ProductOptionCreateForm: View {
             }
 
             dismiss()
+        } catch let fieldError as FieldError {
+            switch fieldError.field {
+            case "name":
+                name.state = .error(reason: fieldError.reason)
+            default:
+                break
+            }
         } catch {
             print(error.localizedDescription)
         }
