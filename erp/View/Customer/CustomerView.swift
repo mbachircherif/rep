@@ -22,13 +22,8 @@ struct CustomerView: View {
                     .frame(maxWidth: 200.0)
 
                 // First & Last names
-                HStack(spacing: 20.0) {
-                    Text(customer.firstName)
-                        .font(.system(size: 13.0, design: .rounded))
-
-                    Text(customer.lastName)
-                        .font(.system(size: 13.0, design: .rounded))
-                }
+                Text(customer.fullName)
+                    .font(.system(size: 13.0, design: .rounded))
 
                 Section {
                     Text(customer.email)

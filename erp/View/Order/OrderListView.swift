@@ -13,34 +13,24 @@ struct OrderListView: View {
     @Environment(\.modelContext)
     private var modelContext
 
-    @Environment(Warehouse.self)
-    private var warehouse
-
     @State
     private var orderToCreate: Order?
 
     @State
     private var orderToUpdate: Order?
 
-    @State
-    var orders: [Order]
+    var warehouse: Warehouse
 
     var body: some View {
         List {
             Section {
-                ForEach(orders) { order in
+                ForEach(warehouse.orders) { order in
                     NavigationLink {
                         OrderView(order: order)
                     } label: {
                         LabeledContent("Numéro", value: order.number.uuidString)
                     }
                 }
-            } header: {
-                Text("Ventes")
-            }
-
-            if orders.isEmpty {
-                Text("Aucune commande n'a été créée pour l'instant.")
             }
         }
         .sheet(item: $orderToCreate) { order in
@@ -80,6 +70,8 @@ struct OrderListView: View {
             }
             .presentationDetents([.large])
         }
+        .navigationTitle("Commandes")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -93,6 +85,6 @@ struct OrderListView: View {
 }
 
 #Preview {
-    OrderListView(orders: [])
+    OrderListView(warehouse: Warehouse(user: User(fullname: "First Last")))
 }
 

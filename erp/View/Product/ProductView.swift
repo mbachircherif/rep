@@ -13,14 +13,8 @@ struct ProductView: View {
     @Environment(\.dismiss)
     private var dismiss
 
-    @Environment(SwiftDataManager.self)
-    private var db
-
     @Environment(\.modelContext)
     private var modelContext
-
-    @State
-    private var productVariantCreateFormPresented: Bool = false
 
     @State
     private var productOptionToCreate: ProductOption?
@@ -52,26 +46,19 @@ struct ProductView: View {
             } footer: {
                 Text("Les variantes sont générées automatiquement à partir des options du produit.")
             }
-        }
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button(role: .destructive) {
-                    product.warehouse?.products.removeAll { $0.name == product.name }
-                    try? modelContext.save()
-                }
+
+            Section {
+                Button("Supprimer", role: .destructive) {}
             }
         }
-        .sheet(isPresented: $productVariantCreateFormPresented) {
-            NavigationStack {
-                ProductVariantCreateFormView(product: product)
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button(role: .cancel) {
-                                productVariantCreateFormPresented = false
-                            }
-                        }
-                    }
-            }
+    }
+
+    private func delete() {
+        do {
+            modelContext.delete(product)
+            try modelContext.save()
+        } catch {
+
         }
     }
 }

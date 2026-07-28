@@ -10,10 +10,15 @@ import SwiftData
 @Model
 final class Warehouse {
 
+    var user: User?
+
     @Attribute(.unique)
     var name: String
 
     var currency: Currency
+
+    @Relationship(deleteRule: .cascade, inverse: \Customer.warehouse)
+    var customers: [Customer] = []
 
     @Relationship(deleteRule: .cascade, inverse: \Product.warehouse)
     var products: [Product] = []
@@ -21,7 +26,8 @@ final class Warehouse {
     @Relationship(deleteRule: .cascade, inverse: \Order.warehouse)
     var orders: [Order] = []
 
-    init(name: String = "", currency: Currency = .usd) {
+    init(user: User, name: String = "", currency: Currency = .usd) {
+        self.user = user
         self.name = name
         self.currency = currency
     }

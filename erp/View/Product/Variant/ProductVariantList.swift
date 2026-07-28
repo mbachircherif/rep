@@ -28,16 +28,18 @@ struct ProductVariantList: View {
             } else {
                 List {
                     ForEach(positionSortedVariants) { variant in
-                        HStack {
-                            let sortedAttributes = variant.attributes.sorted(by: { $0.position < $1.position })
+                        NavigationLink {
+                            ProductVariantView(variant: variant)
+                        } label: {
+                            HStack {
+                                let sortedAttributes = variant.attributes.sorted(by: { $0.position < $1.position })
 
-                            Text(sortedAttributes.compactMap(\.optionValue?.name).joined(separator: "/"))
+                                Text(sortedAttributes.compactMap(\.optionValue?.name).joined(separator: "/"))
 
-                            Spacer()
+                                Spacer()
 
-                            // TODO: Provide a default currency based on Locale
-                            Text(variant.position, format: .number)
-//                            Text(variant.sellingPrice, format: .currency(code: product.warehouse?.currency.rawValue ?? "EUR"))
+                                Text(variant.sku)
+                            }
                         }
                     }
                 }

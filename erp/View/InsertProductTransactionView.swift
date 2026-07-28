@@ -43,7 +43,7 @@ struct InsertProductTransactionView: View {
 }
 
 #Preview {
-    InsertProductTransactionView(product: Product(warehouse: Warehouse(name: "Preview", currency: .eur), name: "ESP 230"))
+    InsertProductTransactionView(product: Product(warehouse: Warehouse(user: User(fullname: "First Last"), name: "Preview", currency: .eur), name: "ESP 230"))
         .frame(height: 100.0)
         .padding()
 }

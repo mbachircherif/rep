@@ -16,14 +16,16 @@ struct WarehouseListView: View {
     @State
     private var warehouseToCreate: Warehouse?
 
-    var warehouses: [Warehouse]
+    var user: User
 
     var body: some View {
         ScrollView(.vertical) {
             LazyVGrid(columns: Array(repeating: GridItem(), count: 2)) {
-                ForEach(warehouses) { warehouse in
-                    NavigationLink {
-                        WarehouseView(warehouse: warehouse)
+                ForEach(user.warehouses) { warehouse in
+                    Button {
+                        withAnimation(.snappy(duration: 0.25)) {
+                            user.warehouse = warehouse
+                        }
                     } label: {
                         // TODO: Extract.
                         VStack(alignment: .leading, spacing: 4.0) {
@@ -80,7 +82,7 @@ struct WarehouseListView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button("Nouveau") {
-                    warehouseToCreate = Warehouse()
+                    warehouseToCreate = Warehouse(user: user)
                 }
             }
         }

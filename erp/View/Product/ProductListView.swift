@@ -19,11 +19,11 @@ struct ProductListView: View {
     @State
     private var productCreateFormPresented: Bool = false
 
-    var products: [Product]
+    var warehouse: Warehouse
 
     var body: some View {
         List {
-            ForEach(products) { product in
+            ForEach(warehouse.products) { product in
                 NavigationLink {
                     ProductView(product: product)
                 } label: {
@@ -52,9 +52,11 @@ struct ProductListView: View {
         .navigationTitle("Produits")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Nouveau") {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
                     productCreateFormPresented = true
+                } label: {
+                    Image(systemName: "plus")
                 }
             }
         }
@@ -62,5 +64,5 @@ struct ProductListView: View {
 }
 
 #Preview {
-    ProductListView(products: [])
+    ProductListView(warehouse: Warehouse(user: User(fullname: "First Last")))
 }

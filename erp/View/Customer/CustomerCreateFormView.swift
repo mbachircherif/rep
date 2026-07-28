@@ -10,19 +10,38 @@ import SwiftUI
 
 struct CustomerCreateFormView: View {
 
+    private enum FieldKey {
+
+        case fullName, email, phone
+    }
+
     @Environment(\.modelContext)
     private var modelContext
 
     @Environment(\.dismiss)
     private var dismiss
 
-    var customer: Customer
+    @State
+    private var fullName: Field<FieldKey, String>
+
+    @State
+    private var email: Field<FieldKey, String>
+
+    @State
+    private var phone: Field<FieldKey, String>
+
+    private var customer: Customer
+
+    init(customer: Customer) {
+        self._fullName  = State(wrappedValue: Field(key: .fullName, value: customer.fullName))
+        self._email     = State(wrappedValue: Field(key: .email, value: customer.email))
+        self._phone     = State(wrappedValue: Field(key: .phone, value: customer.phone))
+
+        self.customer = customer
+    }
 
     var body: some View {
-        @Bindable var customer = customer
-
         Form {
-
             // Customer photo
             Section {
                 ContainerRelativeShape()
@@ -34,22 +53,59 @@ struct CustomerCreateFormView: View {
             }
 
             Section {
-                TextField("First Name", text: $customer.firstName)
-
-                TextField("Last Name", text: $customer.lastName)
+                TextField("Nom complet", text: $fullName.value)
+            } footer: {
+                if case let .error(reason) = fullName.state {
+                    Label(reason, systemImage: "exclamationmark.circle.fill")
+                        .foregroundStyle(.red)
+                }
             }
 
             Section {
-                TextField("Email", text: $customer.email)
-
-                TextField("Phone", text: $customer.phone)
+                TextField("E-mail", text: $email.value)
+                TextField("Téléphone", text: $phone.value)
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button(role: .cancel) {
+                    cancel()
+                }
             }
 
-            Button("Create") {
+            ToolbarItem(placement: .confirmationAction) {
+                Button(role: .confirm) {
+                    create()
+                }
+            }
+        }
+    }
+
+    private func cancel() {
+        dismiss()
+    }
+
+    private func create() {
+        do {
+            if let warehouse = customer.warehouse {
+                if warehouse.customers.contains(where: { $0.fullName == fullName.value }) {
+                    throw FieldError<FieldKey>(field: .fullName, reason: "Ce nom est déjà attribué à un autre client")
+                }
+
+                customer.fullName = fullName.value
+                customer.email    = email.value
+                customer.phone    = phone.value
+
                 modelContext.insert(customer)
-                try? modelContext.save()
-                dismiss()
+
+                try modelContext.save()
             }
+
+            dismiss()
+        } catch let error as FieldError<FieldKey> where error.field == .fullName {
+            fullName.state = .error(reason: error.reason)
+        } catch {
+            print(error.localizedDescription)
         }
     }
 }

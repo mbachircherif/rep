@@ -51,48 +51,39 @@ struct ContentView: View {
     @State
     private var historyChanges: [DataOperationAction] = []
 
-    enum Column: Identifiable {
-
-        var id: Self { self }
-
-        case customer
-
-        case product
-
-        case order
-
-        case main
-    }
-
-    let columns: [Column] = [.product, .customer, .order]
-
-    @State
-    private var selectedColumn: Column = .product
-
     @Query
-    private var warehouses: [Warehouse]
+    private var users: [User]
 
     var body: some View {
-        NavigationStack {
-            WarehouseListView(warehouses: warehouses)
-                .onAppear {
-                    let warehouse = Warehouse(name: "Nike")
+        if let user = users.first {
+            if let warehouse = user.warehouse {
+                WarehouseView(warehouse: warehouse)
+                    .transition(.move(edge: .trailing))
+            } else {
+                NavigationStack {
+                    WarehouseListView(user: user)
+                }
+                .transition(.move(edge: .leading))
+            }
+        } else {
+            ProgressView()
+                .task {
+                    let user = User(fullname: "Ben Kane")
+                    let warehouse = Warehouse(user: user, name: "Nike")
                     let product = Product(warehouse: warehouse, name: "Air Force 1")
 
                     let option1 = ProductOption(product: product, name: "O1", position: 1)
-
                     let option2 = ProductOption(product: product, name: "O2", position: 2)
-
                     let option3 = ProductOption(product: product, name: "O3", position: 3)
 
+                    user.warehouses.append(warehouse)
                     warehouse.products.append(product)
                     product.options.append(contentsOf: [option1, option2, option3])
 
-                    modelContext.insert(warehouse)
+                    modelContext.insert(user)
 
                     try? modelContext.save()
                 }
-
         }
         /*
         NavigationSplitView {

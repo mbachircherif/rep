@@ -10,6 +10,11 @@ import SwiftUI
 
 struct ProductOptionCreateForm: View {
 
+    private enum FieldKey {
+
+        case name
+    }
+
     @Environment(\.modelContext)
     private var modelContext
 
@@ -17,12 +22,12 @@ struct ProductOptionCreateForm: View {
     private var dismiss
 
     @State
-    private var name: Field<String>
+    private var name: Field<FieldKey, String>
 
     private let option: ProductOption
 
     init(option: ProductOption) {
-        self._name = State(wrappedValue: Field(value: option.name))
+        self._name = State(wrappedValue: Field(key: .name, value: option.name))
 
         self.option = option
     }
@@ -52,6 +57,7 @@ struct ProductOptionCreateForm: View {
                     Button(role: .confirm) {
                         create()
                     }
+                    .disabled(name.value.isEmpty)
                 }
             }
             .navigationTitle("Nouveau")
@@ -66,7 +72,7 @@ struct ProductOptionCreateForm: View {
                 // We can interact with product.options
 
                 guard product.options.contains(where: { $0.name == name.value }) == false else {
-                    throw FieldError(field: "name", reason: "Valeur déjà ajoutée")
+                    throw FieldError<FieldKey>(field: .name, reason: "Valeur déjà ajoutée")
                 }
 
                 let productID: PersistentIdentifier = product.id
@@ -82,18 +88,14 @@ struct ProductOptionCreateForm: View {
                 option.name = name.value
                 option.position = lastProductVariantPosition + 1
 
-                option.product?.options.append(option)
+                modelContext.insert(option)
+
                 try modelContext.save()
             }
 
             dismiss()
-        } catch let fieldError as FieldError {
-            switch fieldError.field {
-            case "name":
-                name.state = .error(reason: fieldError.reason)
-            default:
-                break
-            }
+        } catch let error as FieldError<FieldKey> where error.field == .name {
+            name.state = .error(reason: error.reason)
         } catch {
             print(error.localizedDescription)
         }

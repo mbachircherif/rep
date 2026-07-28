@@ -14,7 +14,7 @@ enum Unit: Codable, CaseIterable {
     var symbol: String {
         switch self {
         case .quantity:
-            return "Unité"
+            return "Pièce"
         }
     }
 }

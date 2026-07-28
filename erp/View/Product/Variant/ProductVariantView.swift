@@ -10,16 +10,12 @@ import SwiftUI
 struct ProductVariantView: View {
 
     @State
-    private var deletedAttribute: ProductVariantAttribute?
-
-    @State
-    private var attributeCreateFormPresented: Bool = false
+    private var variantToUpdate: ProductVariant?
 
     var variant: ProductVariant
 
     var body: some View {
         List {
-
             Section {
                 LabeledContent("SKU", value: variant.sku)
             } header: {
@@ -28,49 +24,63 @@ struct ProductVariantView: View {
 
             Section {
                 ForEach(variant.attributes.enumerated(), id: \.element) { index, attribute in
-                    HStack(spacing: 24.0) {
-                        Text(attribute.optionValue?.name ?? "Unknown")
+                    HStack(spacing: 16.0) {
+                        Text(attribute.optionValue?.option?.name ?? "-")
 
                         Spacer()
 
-//                        switch attribute.kind {
-//                        case .color:
-//                            if let color = Color(hex: attribute.value) {
-//                                Circle()
-//                                    .fill(color)
-//                                    .frame(width: 20.0, height: 20.0)
-//                            }
-//                        case .custom:
-//                            Text(attribute.value)
-//                        }
-
-                        Button {
-                            variant.attributes.remove(at: index)
-                        } label: {
-                            Image(systemName: "trash")
-                                .foregroundStyle(.red)
-                        }
+                        Text(attribute.optionValue?.name ?? "-")
                     }
-                }
-
-                Button("Ajouter une caractéristique") {
-                    attributeCreateFormPresented = true
                 }
             } header: {
                 Text("Caractéristiques")
+            } footer: {
+                Text("Les caractéristiques sont générées automatiquement en fonction des options de base de ce produit.")
+            }
+
+            Section {
+                LabeledContent("Prix de revient") {
+                    // TODO: Provide a default currency based on Locale
+                    Text(variant.costPrice, format: .currency(code: variant.product?.warehouse?.currency.rawValue ?? "EUR"))
+                }
+
+                LabeledContent("Prix de vente") {
+                    // TODO: Provide a default currency based on Locale
+                    Text(variant.sellingPrice, format: .currency(code: variant.product?.warehouse?.currency.rawValue ?? "EUR"))
+                }
+            } header: {
+                Text("Prix")
+            }
+
+            Section {
+                LabeledContent("Taux") {
+                    Text(variant.tax.rate, format: .percent)
+                }
+            } header: {
+                Text("TVA")
+            }
+
+            Section {
+                LabeledContent {
+                    Text(variant.stock.unit.symbol)
+                } label: {
+                    Text(variant.stock.amount, format: .number)
+                }
+            } header: {
+                Text("Stock")
             }
         }
-        .sheet(isPresented: $attributeCreateFormPresented) {
-            NavigationStack {
-                ProductVariantAttributeCreateFormView(variant: variant)
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button(role: .cancel) {
-                                attributeCreateFormPresented = false
-                            }
-                        }
-                    }
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    variantToUpdate = variant
+                } label: {
+                    Image(systemName: "pencil")
+                }
             }
+        }
+        .sheet(item: $variantToUpdate) { variant in
+            ProductVariantUpdateFormView(variant: variant)
         }
     }
 }

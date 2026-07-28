@@ -71,10 +71,10 @@ struct OrderUpdateFormView: View {
                 }
 
                 Section {
-                    if order.customer.firstName.isEmpty && order.customer.lastName.isEmpty {
+                    if order.customer.fullName.isEmpty {
                         Text("Aucun client associé.")
                     } else {
-                        Text("\(order.customer.firstName) \(order.customer.firstName)")
+                        Text(order.customer.fullName)
                     }
                 } header: {
                     Text("Client")

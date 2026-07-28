@@ -11,24 +11,23 @@ import SwiftData
 @Model
 final class Customer {
 
-    var firstName: String
+    #Index  <Customer>([\.fullName])
+    #Unique <Customer>([\.fullName])
 
-    var lastName: String
+    var warehouse: Warehouse?
+
+    var fullName: String
 
     var email: String
 
     var phone: String
 
-    var fullName: String {
-        "\(firstName) \(lastName)"
-    }
-
     var createdAt: Date = Date()
 
-    init(firstName: String = "", lastName: String = "", email: String = "", phone: String = "") {
-        self.firstName = firstName
-        self.lastName = lastName
-        self.email = email
-        self.phone = phone
+    init(warehouse: Warehouse, fullName: String = "", email: String = "", phone: String = "") {
+        self.warehouse = warehouse
+        self.fullName  = fullName
+        self.email     = email
+        self.phone     = phone
     }
 }

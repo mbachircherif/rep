@@ -19,9 +19,9 @@ final class ProductVariant {
     /// (ProductB, 2) → row 51
     #Index<ProductVariant>([\.product, \.position])
 
-    var sku: String
-
     var product: Product?
+
+    var sku: String
 
     var position: Int
 
@@ -37,8 +37,8 @@ final class ProductVariant {
     var tax: Tax
 
     init(
-        sku: String = "",
         product: Product?,
+        sku: String = "",
         position: Int,
         attributes: [ProductVariantAttribute] = [],
         costPrice: Decimal = 0,
@@ -46,8 +46,8 @@ final class ProductVariant {
         tax: Tax = Tax(rate: 0, behavior: .inclusive),
         stock: Stock = Stock(amount: 0, unit: .quantity)
     ) {
-        self.sku          = sku
         self.product      = product
+        self.sku          = sku
         self.position     = position
         self.attributes   = attributes
         self.costPrice    = costPrice
@@ -68,21 +68,5 @@ extension ProductVariant: Hashable {
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(sku)
-    }
-}
-
-extension ProductVariant {
-
-    func copy() -> ProductVariant {
-        ProductVariant(
-            sku          : sku,
-            product      : product,
-            position     : position,
-            attributes   : attributes.map { $0.copy() },
-            costPrice    : costPrice,
-            sellingPrice : sellingPrice,
-            tax          : tax,
-            stock        : stock
-        )
     }
 }

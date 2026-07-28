@@ -33,9 +33,7 @@ struct CustomerUpdateFormView: View {
                 }
 
                 Section {
-                    TextField("First Name", text: $customer.firstName)
-
-                    TextField("Last Name", text: $customer.lastName)
+                    TextField("First Name", text: $customer.fullName)
                 }
 
                 Section {

@@ -116,8 +116,7 @@ struct OrderCreateFormView: View {
                     List {
                         ForEach(customers) { customer in
                             Button {
-                                order.customer.firstName = customer.firstName
-                                order.customer.lastName  = customer.lastName
+                                order.customer.fullName = customer.fullName
                             } label: {
                                 HStack {
                                     Text(customer.fullName)
@@ -130,10 +129,10 @@ struct OrderCreateFormView: View {
                         }
                     }
                 } label: {
-                    if order.customer.firstName.isEmpty && order.customer.lastName.isEmpty {
+                    if order.customer.fullName.isEmpty {
                         Text("Select a customer")
                     } else {
-                        Text("\(order.customer.firstName) \(order.customer.lastName)")
+                        Text(order.customer.fullName)
                     }
                 }
             }

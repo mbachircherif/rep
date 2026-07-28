@@ -13,17 +13,22 @@ struct CustomerListView: View {
     @Environment(\.modelContext)
     private var modelContex
 
-    @Query
-    private var customers: [Customer]
-
     @State
     private var createCustomer: Customer?
 
     @State
     private var updateCustomer: Customer?
 
+    var warehouse: Warehouse
+
+    private var customers: [Customer] {
+        warehouse.customers.sorted(using: SortDescriptor(\.fullName, comparator: .localizedStandard))
+    }
+
     var body: some View {
         List {
+            Text("Aucun client pour le moment")
+
             ForEach(customers) { customer in
                 Button {
                     updateCustomer = customer
@@ -48,20 +53,12 @@ struct CustomerListView: View {
                 }
             }
         }
+        .navigationTitle("Clients")
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $createCustomer) { customer in
             NavigationStack {
                 CustomerCreateFormView(customer: customer)
-                    .toolbar {
-                        ToolbarItem(placement: .destructiveAction) {
-                            Button {
-                                createCustomer = nil
-                            } label: {
-                                Image(systemName: "xmark")
-                            }
-                        }
-                    }
             }
-            .presentationDetents([.large])
         }
         .sheet(item: $updateCustomer) { customer in
             NavigationStack {
@@ -79,9 +76,12 @@ struct CustomerListView: View {
             .presentationDetents([.large])
         }
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("New Client") {
-                    createCustomer = Customer()
+            // Add new customer button
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    createCustomer = Customer(warehouse: warehouse)
+                } label: {
+                    Image(systemName: "plus")
                 }
             }
         }
@@ -89,6 +89,6 @@ struct CustomerListView: View {
 }
 
 #Preview {
-    CustomerListView()
+    CustomerListView(warehouse: Warehouse(user: User(fullname: "Goerge")))
 }
 

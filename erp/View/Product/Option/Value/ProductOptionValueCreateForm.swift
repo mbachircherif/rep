@@ -11,6 +11,11 @@ import SwiftUI
 
 struct ProductOptionValueCreateForm: View {
 
+    private enum FieldKey {
+
+        case name
+    }
+
     @Environment(\.modelContext)
     private var modelContext
 
@@ -18,12 +23,12 @@ struct ProductOptionValueCreateForm: View {
     private var dismiss
 
     @State
-    private var name: Field<String>
+    private var name: Field<FieldKey, String>
 
     private let value: ProductOptionValue
 
     init(value: ProductOptionValue) {
-        self._name = State(wrappedValue: Field(value: value.name))
+        self._name = State(wrappedValue: Field(key: .name, value: value.name))
 
         self.value = value
     }
@@ -56,6 +61,7 @@ struct ProductOptionValueCreateForm: View {
                     Button(role: .confirm) {
                         create()
                     }
+                    .disabled(name.value.isEmpty)
                 }
             }
             .navigationTitle("Nouveau")
@@ -69,7 +75,7 @@ struct ProductOptionValueCreateForm: View {
             if let option = value.option, let product = option.product {
 
                 guard option.values.contains(where: { $0.name == name.value }) == false else {
-                    throw FieldError(field: "name", reason: "Valeur déjà ajoutée")
+                    throw FieldError<FieldKey>(field: .name, reason: "Valeur déjà ajoutée")
                 }
 
                 /// Update value's fields
@@ -82,7 +88,7 @@ struct ProductOptionValueCreateForm: View {
                 let nonEmptyOptions = product.options.filter { !$0.values.isEmpty }
 
                 if nonEmptyOptions.count > 1 && option.values.count == 1 {
-                    ///
+
                     /// Perform additive attribute operation on existing variant only if
                     /// the sum of non empty options is superior to 1 and the new option value is the only one too belong to its option.
                     /// ex:
@@ -97,12 +103,23 @@ struct ProductOptionValueCreateForm: View {
 
                     /// Add to documentation:
                     /// /!\ - The position of `ProductVariantAttribute` should be the same as its `ProdutOptionValue`'s option position.
+                    ///
+                    /// ex:
+                    /// | Option | Option position | Value | Variant attribute position |
+                    /// |--------|-----------------|-------|----------------------------|
+                    /// | Size   | 0               | S     | 0                          |
+                    /// | Color  | 1               | Red   | 1                          |
+                    /// | Shape  | 2               | Square| 2                          |
+                    ///
+                    /// So inserting the value "Red" for the option "Color" (position 1) produces a
+                    /// `ProductVariantAttribute` whose position is also 1.
+
                     for variant in product.variants {
                         let attribute = ProductVariantAttribute(variant: variant, optionValue: value, position: option.position)
                         variant.attributes.append(attribute)
                     }
                 } else {
-                    ///
+
                     /// Perform cartesian product for the rest of the cases.
                     /// ex:
                     /// - Size[S] || Size[S, **M**] || Size[S], Color[Red, **Green**] || Size[S, **M**], Color[Red, Green]
@@ -116,7 +133,6 @@ struct ProductOptionValueCreateForm: View {
                     /// - [S, Green]
                     /// - [M, Red]
                     /// - [M- Green]
-                    ///
 
                     let productID: PersistentIdentifier = product.id
                     /// Tree options is reversed.
@@ -133,7 +149,7 @@ struct ProductOptionValueCreateForm: View {
                     func createVariantCombinations(values: [(value: ProductOptionValue, position: Int)], depth: Int) throws {
                         // No more node to path. We reach a leaf of the option values tree.
                         if depth == productOptionsCount {
-                            let newProductVariant = ProductVariant(product: product, position: lastProductVariantPosition + 1)
+                            let newProductVariant = createProductVariant(product: product, position: lastProductVariantPosition + 1)
 
                             /// We fill the variant attributes in the reverse order as they stack since options are in the reversed the tree..
                             for index in values.indices {
@@ -147,8 +163,6 @@ struct ProductOptionValueCreateForm: View {
 
                                 newProductVariant.attributes.append(productVariantAttribute)
                             }
-
-                            newProductVariant.attributes.forEach { print("POSITION \($0.position)") }
 
                             product.variants.append(newProductVariant)
                             lastProductVariantPosition += 1
@@ -196,13 +210,8 @@ struct ProductOptionValueCreateForm: View {
             }
 
             dismiss()
-        } catch let fieldError as FieldError {
-            switch fieldError.field {
-            case "name":
-                name.state = .error(reason: fieldError.reason)
-            default:
-                break
-            }
+        } catch let error as FieldError<FieldKey> where error.field == .name {
+            name.state = .error(reason: error.reason)
         } catch {
             print(error.localizedDescription)
         }
@@ -210,5 +219,13 @@ struct ProductOptionValueCreateForm: View {
 
     private func cancel() {
         dismiss()
+    }
+
+    private func createProductVariant(product: Product, position: Int) -> ProductVariant {
+        ProductVariant(
+            product  : product,
+            sku      : "SKU-\(position)",
+            position : position
+        )
     }
 }
