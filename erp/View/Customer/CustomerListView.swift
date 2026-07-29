@@ -16,39 +16,38 @@ struct CustomerListView: View {
     @State
     private var createCustomer: Customer?
 
-    @State
-    private var updateCustomer: Customer?
+    @Query
+    private var customers: [Customer]
 
-    var warehouse: Warehouse
+    private var warehouse: Warehouse
 
-    private var customers: [Customer] {
-        warehouse.customers.sorted(using: SortDescriptor(\.fullName, comparator: .localizedStandard))
+    init(warehouse: Warehouse) {
+        let warehouseID = warehouse.id
+
+        var fetchCustomerDescriptor = FetchDescriptor<Customer>()
+        fetchCustomerDescriptor.predicate = #Predicate { $0.warehouse?.persistentModelID == warehouseID }
+        fetchCustomerDescriptor.sortBy = [SortDescriptor(\.fullName, comparator: .localizedStandard)]
+
+        self._customers = Query(fetchCustomerDescriptor)
+        self.warehouse = warehouse
     }
 
     var body: some View {
         List {
-            Text("Aucun client pour le moment")
-
             ForEach(customers) { customer in
-                Button {
-                    updateCustomer = customer
+                NavigationLink {
+                    CustomerView(customer: customer)
                 } label: {
                     HStack(spacing: 16.0) {
                         ContainerRelativeShape()
                             .fill(.gray.quinary)
-                            .frame(maxWidth: 75.0)
                             .aspectRatio(1, contentMode: .fit)
+                            .frame(maxWidth: 50.0)
 
                         Text(customer.fullName)
 
                         Spacer()
 
-                        Button {
-                            modelContex.delete(customer)
-                            try? modelContex.save()
-                        } label: {
-                            Image(systemName: "xmark.circle.fill")
-                        }
                     }
                 }
             }
@@ -59,21 +58,6 @@ struct CustomerListView: View {
             NavigationStack {
                 CustomerCreateFormView(customer: customer)
             }
-        }
-        .sheet(item: $updateCustomer) { customer in
-            NavigationStack {
-                CustomerUpdateFormView(id: customer.id)
-                    .toolbar {
-                        ToolbarItem(placement: .destructiveAction) {
-                            Button {
-                                updateCustomer = nil
-                            } label: {
-                                Image(systemName: "xmark")
-                            }
-                        }
-                    }
-            }
-            .presentationDetents([.large])
         }
         .toolbar {
             // Add new customer button

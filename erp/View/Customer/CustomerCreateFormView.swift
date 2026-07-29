@@ -32,6 +32,10 @@ struct CustomerCreateFormView: View {
 
     private var customer: Customer
 
+    private var isFormValid: Bool {
+        fullName.value.isEmpty == false && email.value.isEmpty == false && phone.value.isEmpty == false
+    }
+
     init(customer: Customer) {
         self._fullName  = State(wrappedValue: Field(key: .fullName, value: customer.fullName))
         self._email     = State(wrappedValue: Field(key: .email, value: customer.email))
@@ -77,6 +81,7 @@ struct CustomerCreateFormView: View {
                 Button(role: .confirm) {
                     create()
                 }
+                .disabled(!isFormValid)
             }
         }
     }
@@ -88,6 +93,8 @@ struct CustomerCreateFormView: View {
     private func create() {
         do {
             if let warehouse = customer.warehouse {
+                // TODO: Use lowercase to compare ?
+                // If so, create an index of a lowercase fullname.
                 if warehouse.customers.contains(where: { $0.fullName == fullName.value }) {
                     throw FieldError<FieldKey>(field: .fullName, reason: "Ce nom est déjà attribué à un autre client")
                 }
