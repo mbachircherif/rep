@@ -9,7 +9,9 @@ import SwiftUI
 
 struct OrderView: View {
 
-    @Bindable
+    @State
+    private var isOrderUpdateFormPresented: Bool = false
+
     var order: Order
 
     var body: some View {
@@ -17,14 +19,7 @@ struct OrderView: View {
             Section {
                 LabeledContent("Number", value: order.number.uuidString)
 
-                Picker(selection: $order.status) {
-                    Text("En attente")
-                        .tag(Order.Status.waiting)
-                    Text("Payé")
-                        .tag(Order.Status.paid)
-                    Text("Annulée")
-                        .tag(Order.Status.canceled)
-                } label: {
+                LabeledContent("Statut") {
                     switch order.status {
                     case .waiting:
                         HStack {
@@ -57,44 +52,39 @@ struct OrderView: View {
             }
 
             Section {
-                if order.customer.fullName.isEmpty {
-                    Text("Aucun client associé.")
-                } else {
-                    Text(order.customer.fullName)
-                }
-            } header: {
-                Text("Client")
+                Text(order.customer.fullName)
             }
 
             Section {
                 ForEach(order.variants) { variant in
-                    if let productVariant = variant.reference {
-                        NavigationLink {
-                            ProductVariantView(variant: productVariant)
-                        } label: {
-                            HStack {
-                                Text(variant.sku)
+                    HStack(spacing: 16.0) {
+                        ContainerRelativeShape()
+                            .fill(.quinary)
+                            .aspectRatio(1, contentMode: .fit)
+                            .frame(maxWidth: 50.0)
 
-                                Spacer()
+                        VStack(alignment: .leading, spacing: 8.0) {
+                            Text(variant.name)
+                                .foregroundStyle(.primary)
+                                .font(.default)
+                                .lineLimit(1)
 
-                                Text("\(variant.stock.amount, format: .number) \(variant.stock.unit.symbol)")
-
-                                Spacer()
-
-                                Text(variant.sellingPrice, format: .currency(code: order.warehouse.currency.rawValue))
-                            }
-                        }
-                    } else {
-                        HStack {
                             Text(variant.sku)
+                                .foregroundStyle(.secondary)
+                                .font(.footnote)
+                                .lineLimit(1)
+                        }
 
-                            Spacer()
+                        Spacer()
 
-                            Text("\(variant.stock.amount, format: .number) \(variant.stock.unit.symbol)")
+                        VStack(alignment: .trailing, spacing: 8.0) {
+                            Text("\(variant.subtotal, format: .currency(code: order.warehouse.currency.rawValue)) (HT)")
+                                .lineLimit(1)
 
-                            Spacer()
-
-                            Text(variant.sellingPrice, format: .currency(code: order.warehouse.currency.rawValue))
+                            Text("\(variant.quantity.amount, format: .number) \(variant.quantity.unit.symbol)")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
                         }
                     }
                 }
@@ -103,11 +93,34 @@ struct OrderView: View {
             }
 
             Section {
-                LabeledContent("Sous-total", value: order.subtotal, format: .currency(code: order.warehouse.currency.rawValue))
+                // Subtotal
+                LabeledContent("Sous-total (HT)", value: order.subtotal, format: .currency(code: order.warehouse.currency.rawValue))
 
+                // Taxes
+                ForEach(Array(order.taxes), id: \.key) { tax, amount in
+                    LabeledContent("TVA (\(tax.rate, format: .percent))", value: amount, format: .currency(code: order.warehouse.currency.rawValue))
+                }
+
+                // Total
                 LabeledContent("Total", value: order.total, format: .currency(code: order.warehouse.currency.rawValue))
-            } header: {
-                Text("Facturation")
+                    .fontWeight(.medium)
+            }
+        }
+        .listRowSpacing(16.0)
+        .sheet(isPresented: $isOrderUpdateFormPresented) {
+            NavigationStack {
+                OrderUpdateForm(order: order)
+            }
+        }
+        .navigationTitle("Numéro de commande")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    isOrderUpdateFormPresented = true
+                } label: {
+                    Image(systemName: "pencil")
+                }
             }
         }
     }

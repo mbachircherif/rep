@@ -27,7 +27,7 @@ final class OrderVariant {
 
     var tax: Tax
 
-    var stock: Stock
+    var quantity: Stock
 
     var subtotal: Decimal {
         let total = total
@@ -39,10 +39,10 @@ final class OrderVariant {
     }
 
     var total: Decimal {
-        sellingPrice * stock.amount
+        sellingPrice * quantity.amount
     }
 
-    init(reference: ProductVariant? = nil, order: Order, sku: String, name: String, attributes: [OrderVariantAttribute] = [], costPrice: Decimal, sellingPrice: Decimal, tax: Tax, stock: Stock) {
+    init(reference: ProductVariant? = nil, order: Order, sku: String, name: String, attributes: [OrderVariantAttribute] = [], costPrice: Decimal, sellingPrice: Decimal, tax: Tax, quantity: Stock) {
         self.order = order
         self.reference = reference
         self.sku = sku
@@ -51,7 +51,7 @@ final class OrderVariant {
         self.costPrice = costPrice
         self.sellingPrice = sellingPrice
         self.tax = tax
-        self.stock = stock
+        self.quantity = quantity
     }
 }
 

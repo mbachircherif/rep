@@ -1,5 +1,5 @@
 //
-//  ProductVariantUpdateFormView.swift
+//  ProductVariantUpdateForm.swift
 //  erp
 //
 //  Created by Mohamed BACHIR-CHERIF on 13/07/2026.
@@ -8,7 +8,7 @@
 import SwiftData
 import SwiftUI
 
-struct ProductVariantUpdateFormView: View {
+struct ProductVariantUpdateForm: View {
 
     private enum FieldKey {
 

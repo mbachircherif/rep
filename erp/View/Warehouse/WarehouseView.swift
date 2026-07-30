@@ -10,13 +10,23 @@ import SwiftUI
 struct WarehouseView: View {
 
     @State
-    private var tab: NavigationTab = .product
+    private var tab: NavigationTab = .dashboard
 
     var warehouse: Warehouse
 
     var body: some View {
         TabView(selection: $tab){
             Group {
+                NavigationStack {
+                    DashboardView(warehouse: warehouse)
+                        .toolbar {
+                            ToolbarItem(placement: .topBarLeading) {
+                                menu
+                            }
+                        }
+                }
+                .tag(NavigationTab.dashboard)
+
                 NavigationStack {
                     ProductListView(warehouse: warehouse)
                         .toolbar {
@@ -54,6 +64,10 @@ struct WarehouseView: View {
     private var menu: some View {
         Menu {
             Section("Menu") {
+                Button("Synthèse", systemImage: "chart.pie.fill") {
+                    tab = .dashboard
+                }
+
                 Button("Commandes", systemImage: "tray.fill") {
                     tab = .order
                 }

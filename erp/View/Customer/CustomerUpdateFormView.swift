@@ -67,7 +67,10 @@ struct CustomerUpdateFormView: View {
 
             Section {
                 TextField("E-mail", text: $email.value)
+                    .keyboardType(.emailAddress)
+
                 TextField("Téléphone", text: $phone.value)
+                    .keyboardType(.phonePad)
             }
         }
         .toolbar {

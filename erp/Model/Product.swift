@@ -11,6 +11,8 @@ import SwiftData
 @Model
 final class Product {
 
+    #Index<Product>([\.warehouse], [\.createdAt])
+
     var warehouse: Warehouse?
 
     @Attribute(.unique)
@@ -21,6 +23,10 @@ final class Product {
 
     @Relationship(deleteRule: .cascade, inverse: \ProductVariant.product)
     var variants: [ProductVariant] = []
+
+//    var position: Int
+
+    var createdAt: Date = Date()
 
     init(warehouse: Warehouse, name: String) {
         self.warehouse = warehouse

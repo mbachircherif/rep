@@ -29,7 +29,7 @@ struct OrderVariantView: View {
 
             Section {
                 LabeledContent("Quantité") {
-                    TextField("Requis", value: $variant.stock.amount, format: .number)
+                    TextField("Requis", value: $variant.quantity.amount, format: .number)
                         .keyboardType(.numberPad)
                 }
             }

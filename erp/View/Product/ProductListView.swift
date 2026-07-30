@@ -33,7 +33,7 @@ struct ProductListView: View {
         }
         .sheet(isPresented: $productCreateFormPresented) {
             NavigationStack {
-                ProductCreateFormView()
+                ProductCreateFormView(warehouse: warehouse)
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button(role: .cancel) {

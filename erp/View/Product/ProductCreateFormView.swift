@@ -16,11 +16,10 @@ struct ProductCreateFormView: View {
     @Environment(\.modelContext)
     private var modelContext
 
-    @Environment(Warehouse.self)
-    private var warehouse
-
     @State
     private var name: String = ""
+
+    var warehouse: Warehouse
 
     var body: some View {
         Form {
@@ -42,4 +41,3 @@ struct ProductCreateFormView: View {
         }
     }
 }
-

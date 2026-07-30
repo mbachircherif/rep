@@ -80,7 +80,7 @@ struct ProductVariantView: View {
             }
         }
         .sheet(item: $variantToUpdate) { variant in
-            ProductVariantUpdateFormView(variant: variant)
+            ProductVariantUpdateForm(variant: variant)
         }
     }
 }

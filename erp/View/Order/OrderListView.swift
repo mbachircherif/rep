@@ -14,12 +14,18 @@ struct OrderListView: View {
     private var modelContext
 
     @State
-    private var orderToCreate: Order?
+    private var isOrderCreatedFormPresented: Bool = false
 
-    @State
-    private var orderToUpdate: Order?
+    @Query
+    private var orders: [Order]
 
-    var warehouse: Warehouse
+    private var warehouse: Warehouse
+
+    init(warehouse: Warehouse) {
+        self._orders = Query(Order.fetchMany(warehouse: warehouse))
+
+        self.warehouse = warehouse
+    }
 
     var body: some View {
         List {
@@ -33,49 +39,17 @@ struct OrderListView: View {
                 }
             }
         }
-        .sheet(item: $orderToCreate) { order in
+        .sheet(isPresented: $isOrderCreatedFormPresented) {
             NavigationStack {
-                OrderCreateFormView(order: order)
-                    .toolbar {
-                        // Create button
-                        ToolbarItem(placement: .primaryAction) {
-                            Button("Créer") {
-                                modelContext.insert(order)
-                                try? modelContext.save()
-                                orderToCreate = nil
-                            }
-                            .buttonStyle(.glassProminent)
-                        }
-
-                        // Dismiss button
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button(role: .cancel) {
-                                orderToCreate = nil
-                            }
-                        }
-                    }
+                OrderCreateFormView(warehouse: warehouse)
             }
-        }
-        .sheet(item: $orderToUpdate) { order in
-            NavigationStack {
-                OrderUpdateFormView(id: order.persistentModelID)
-                    .environment(\.modelContext, ModelContext.appContext(modelContext.container))
-                    .toolbar {
-                        Button {
-                            orderToUpdate = nil
-                        } label: {
-                            Image(systemName: "xmark")
-                        }
-                    }
-            }
-            .presentationDetents([.large])
         }
         .navigationTitle("Commandes")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
-                    orderToCreate = Order(warehouse: warehouse)
+                    isOrderCreatedFormPresented = true
                 } label: {
                     Image(systemName: "plus")
                 }

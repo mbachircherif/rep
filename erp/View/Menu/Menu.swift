@@ -7,6 +7,8 @@
 
 enum NavigationTab {
 
+    case dashboard
+
     case product
 
     case order

@@ -10,14 +10,11 @@ import SwiftData
 @Model
 final class OrderVariantAttribute {
 
-    var kind: AttributeKind
-
     var key: String
 
     var value: String
 
-    init(kind: AttributeKind, key: String, value: String) {
-        self.kind = kind
+    init(key: String, value: String) {
         self.key = key
         self.value = value
     }

@@ -29,10 +29,6 @@ final class Order {
         variants.reduce(Decimal(0)) { $0 + $1.subtotal }
     }
 
-    var totalTaxes: Decimal {
-        variants.reduce(Decimal(0)) { $0 + $1.totalTaxes }
-    }
-
     var total: Decimal {
         variants.reduce(Decimal(0)) { $0 + $1.total }
     }
@@ -51,7 +47,7 @@ final class Order {
         return taxesMap
     }
 
-    init(warehouse: Warehouse, customer: OrderCustomer = .init(), status: Status = .waiting) {
+    init(warehouse: Warehouse, customer: OrderCustomer, status: Status = .waiting) {
         self.warehouse = warehouse
         self.customer = customer
         self.status = status
@@ -74,5 +70,17 @@ extension Order {
 
     static var fetchAll: FetchDescriptor<Order> {
         FetchDescriptor<Order>()
+    }
+
+    static func fetchMany(warehouse: Warehouse) -> FetchDescriptor<Order> {
+        var fetchDescription = FetchDescriptor<Order>()
+
+        let warehouseID = warehouse.id
+
+        fetchDescription.predicate = #Predicate {
+            $0.warehouse.persistentModelID == warehouseID
+        }
+
+        return fetchDescription
     }
 }
