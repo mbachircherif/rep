@@ -92,92 +92,153 @@ struct DashboardView: View {
                     }
                 }
 
-                // Margin
+                Spacer()
 
+                // Margin
                 Section {
                     VStack(spacing: 24.0) {
                         HStack(spacing: 24.0) {
-                            VStack(alignment: .leading, spacing: 8.0) {
-                                Image(systemName: "arrow.up.right")
-                                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                                    .foregroundStyle(.backgroundGreen)
+                            VStack(alignment: .leading, spacing: .zero) {
+                                Text("Margin")
+                                    .foregroundStyle(Color(hex: "#f59e0b")!)
+                                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                                    .padding(EdgeInsets(top: 12.0, leading: 16.0, bottom: 8.0, trailing: 16.0))
 
-                                Text(2305, format: .number)
-                                    .foregroundStyle(.black)
-                                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                                VStack(alignment: .leading, spacing: 8.0) {
+                                    Text(0.0675, format: .percent.sign(strategy: .always()))
+                                        .foregroundStyle(Color(hex: "#f59e0b")!)
+                                        .font(.system(size: 16, weight: .semibold, design: .rounded))
 
-                                Text("Average daily")
-                                    .foregroundStyle(.gray)
-                                    .font(.system(size: 16, weight: .medium, design: .rounded))
+                                    Spacer()
+                                    Spacer()
+
+                                    Text("Today")
+                                        .font(Font.system(size: 16.0, weight: .medium, design: .rounded))
+                                        .foregroundStyle(Color(white: 0.65))
+
+                                    Text(2310, format: .currency(code: "EUR"))
+                                        .lineLimit(1)
+                                        .foregroundStyle(.black)
+                                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                                }
+                                .padding()
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                                .background(.white)
                             }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(18.0)
-                            .background(Color(white: 0.975), in: .rect(cornerRadius: 14.0))
+                            .aspectRatio(1, contentMode: .fit)
+                            .frame(maxWidth: .infinity)
+                            .padding(2.0)
+                            .background(Color(hex: "#fef3c7")!, in: .rect(cornerRadius: 32.0))
 
-                            VStack(alignment: .leading, spacing: 8.0) {
-                                Image(systemName: "arrow.up.right")
-                                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                                    .foregroundStyle(.backgroundGreen)
+                            VStack(alignment: .leading, spacing: .zero) {
+                                Text("Grosse")
+                                    .foregroundStyle(Color(hex: "#38bdf8")!)
+                                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                                    .padding(EdgeInsets(top: 12.0, leading: 16.0, bottom: 8.0, trailing: 16.0))
 
-                                Text(82, format: .number)
-                                    .foregroundStyle(.black)
-                                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                                VStack(alignment: .leading, spacing: 8.0) {
+                                    Text(0.25, format: .percent.sign(strategy: .always()))
+                                        .foregroundStyle(Color(hex: "#38bdf8")!)
+                                        .font(.system(size: 16, weight: .semibold, design: .rounded))
 
-                                Text("Average daily")
-                                    .foregroundStyle(.gray)
-                                    .font(.system(size: 16, weight: .medium, design: .rounded))
+                                    Spacer()
+                                    Spacer()
+
+                                    Text("Today")
+                                        .font(Font.system(size: 16.0, weight: .medium, design: .rounded))
+                                        .foregroundStyle(Color(white: 0.65))
+
+                                    Text(20.54, format: .currency(code: "EUR"))
+                                        .lineLimit(1)
+                                        .foregroundStyle(.black)
+                                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                                }
+                                .padding()
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                                .background(.white)
                             }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(18.0)
-                            .background(Color(white: 0.975), in: .rect(cornerRadius: 14.0))
+                            .aspectRatio(1, contentMode: .fit)
+                            .frame(maxWidth: .infinity)
+                            .padding(2.0)
+                            .background(Color(hex: "#e0f2fe")!, in: .rect(cornerRadius: 32.0))
                         }
 
                         HStack(spacing: 24.0) {
-                            VStack(alignment: .leading, spacing: 8.0) {
-                                Image(systemName: "arrow.up.right")
-                                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                                    .foregroundStyle(.backgroundGreen)
+                            VStack(alignment: .leading, spacing: .zero) {
+                                Text("Sales")
+                                    .foregroundStyle(Color(hex: "#22c55e")!)
+                                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                                    .padding(EdgeInsets(top: 12.0, leading: 16.0, bottom: 8.0, trailing: 16.0))
 
-                                Text(9, format: .number)
-                                    .foregroundStyle(.black)
-                                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                                VStack(alignment: .leading, spacing: 8.0) {
+                                    Text(1.143, format: .percent.sign(strategy: .always()))
+                                        .foregroundStyle(Color(hex: "#22c55e")!)
+                                        .font(.system(size: 16, weight: .semibold, design: .rounded))
 
-                                Text("Average daily")
-                                    .foregroundStyle(.gray)
-                                    .font(.system(size: 16, weight: .medium, design: .rounded))
+                                    Spacer()
+                                    Spacer()
+
+                                    Text("Today")
+                                        .font(Font.system(size: 16.0, weight: .medium, design: .rounded))
+                                        .foregroundStyle(Color(white: 0.65))
+
+                                    Text(768, format: .currency(code: "EUR"))
+                                        .lineLimit(1)
+                                        .foregroundStyle(.black)
+                                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                                }
+                                .padding()
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                                .background(.white)
                             }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(18.0)
-                            .background(Color(white: 0.975), in: .rect(cornerRadius: 14.0))
+                            .aspectRatio(1, contentMode: .fit)
+                            .frame(maxWidth: .infinity)
+                            .padding(2.0)
+                            .background(Color(hex: "#dcfce7")!, in: .rect(cornerRadius: 32.0))
 
-                            VStack(alignment: .leading, spacing: 8.0) {
-                                Image(systemName: "arrow.up.right")
-                                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                                    .foregroundStyle(.backgroundGreen)
+                            VStack(alignment: .leading, spacing: .zero) {
+                                Text("Benefices")
+                                    .foregroundStyle(Color(hex: "#6366f1")!)
+                                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                                    .padding(EdgeInsets(top: 12.0, leading: 16.0, bottom: 8.0, trailing: 16.0))
 
-                                Text(101, format: .number)
-                                    .foregroundStyle(.black)
-                                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                                VStack(alignment: .leading, spacing: 8.0) {
+                                    Text(0.76, format: .percent.sign(strategy: .always()))
+                                        .foregroundStyle(Color(hex: "#818cf8")!)
+                                        .font(.system(size: 16, weight: .semibold, design: .rounded))
 
-                                Text("Average daily")
-                                    .foregroundStyle(.gray)
-                                    .font(.system(size: 16, weight: .medium, design: .rounded))
+                                    Spacer()
+                                    Spacer()
+
+                                    Text("Today")
+                                        .font(Font.system(size: 16.0, weight: .medium, design: .rounded))
+                                        .foregroundStyle(Color(white: 0.65))
+
+                                    Text(312, format: .currency(code: "EUR"))
+                                        .lineLimit(1)
+                                        .foregroundStyle(.black)
+                                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                                }
+                                .padding()
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                                .background(.white)
                             }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(18.0)
-                            .background(Color(white: 0.975), in: .rect(cornerRadius: 14.0))
+                            .frame(maxWidth: .infinity)
+                            .padding(2.0)
+                            .background(Color(hex: "#e0e7ff")!, in: .rect(cornerRadius: 32.0))
                         }
                     }
                 } header: {
                     HStack {
                         Text("Statistiques")
-                            .font(.system(size: 18.0, weight: .semibold, design: .rounded))
+                            .font(.system(size: 20.0, weight: .semibold, design: .rounded))
                             .foregroundStyle(Color(white: 0.25))
 
                         Spacer()
                     }
-                    .padding(.top, 24.0)
                 }
+
+                Spacer()
 
                 Section {
                     Grid(verticalSpacing: 6.0) {
@@ -251,20 +312,19 @@ struct DashboardView: View {
                         }
                         .padding(6.0)
                     }
-                }
-                header: {
+                } header: {
                     HStack {
                         Text("Commandes")
-                            .font(.system(size: 18.0, weight: .semibold, design: .rounded))
+                            .font(.system(size: 20.0, weight: .semibold, design: .rounded))
                             .foregroundStyle(Color(white: 0.25))
 
                         Spacer()
                     }
-                    .padding(.top, 24.0)
                 }
             }
             .padding(24.0)
         }
+        .background(Color(white: 0.985))
         .sheet(isPresented: $isDatePickerPresented) {
             DatePicker("Start Date", selection: $date, displayedComponents: [.date])
                 .datePickerStyle(.graphical)
