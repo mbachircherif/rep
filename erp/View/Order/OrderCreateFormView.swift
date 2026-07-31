@@ -23,7 +23,7 @@ struct OrderCreateFormView: View {
     private var modelContext
 
     @State
-    private var form = OrderCreateForm()
+    private var form: OrderCreateForm
 
     @State
     private var selectedItemIndex: Int?
@@ -31,7 +31,16 @@ struct OrderCreateFormView: View {
     @State
     private var selectedVariants: [ProductVariant] = []
 
+    @State
+    private var itemToDiscount: OrderFormItem?
+
     var warehouse: Warehouse
+
+    init(warehouse: Warehouse) {
+        self._form = State(wrappedValue: OrderCreateForm(currency: warehouse.currency))
+
+        self.warehouse = warehouse
+    }
 
     var body: some View {
         Form {
@@ -49,8 +58,8 @@ struct OrderCreateFormView: View {
             }
 
             // Variants
-            Section {
-                ForEach(form.items.enumerated(), id: \.element) { index, item in
+            ForEach(form.items.enumerated(), id: \.element) { index, item in
+                Section {
                     Button {
                         withAnimation(.smooth) {
                             selectedItemIndex = index
@@ -92,16 +101,38 @@ struct OrderCreateFormView: View {
                     .buttonStyle(.plain)
                     .listRowBackground(selectedItemIndex == index ? Color.blue : nil)
                     .listRowInsets(EdgeInsets(2.0))
-                }
 
+                    // Discounts
+                    ForEach(item.discounts) { discount in
+                        LabeledContent(discount.name) {
+                            Text(-item.priceOff(for: discount), format: .currency(code: form.currency.rawValue))
+                                .foregroundStyle(.green)
+                        }
+                    }
+                }
+            }
+
+            Section {
                 NavigationLink("Ajouter un variant") {
                     OrderProductVariantPicker(warehouse: warehouse, form: form, selectedVariants: $selectedVariants)
                 }
             }
 
             Section {
+                NavigationLink("Ajouter une remise") {
+                    OrderCreateFormDiscountList(form: form)
+                }
+            }
+
+            Section {
                 // Subtotal
-                LabeledContent("Sous-total (HT)", value: form.subtotal, format: .currency(code: warehouse.currency.rawValue))
+                LabeledContent("Sous-total (HT)", value: form.subtotal, format: .currency(code: form.currency.rawValue))
+
+
+                LabeledContent("Remises") {
+                    Text(form.totalDiscount, format: .currency(code: form.currency.rawValue))
+                        .foregroundStyle(.indigo)
+                }
 
                 // Taxes
                 ForEach(Array(form.taxes), id: \.key) { tax, amount in
@@ -118,51 +149,77 @@ struct OrderCreateFormView: View {
 
                 let selectedItem = form.items[selectedItemIndex]
 
-                HStack {
-                    Button {
-                        if selectedItem.canDecreaseQuantity {
-                            form.items[selectedItemIndex].quantity.amount -= 1
-                        } else {
-                            selectedVariants.remove(at: selectedItemIndex)
-                            form.items.remove(at: selectedItemIndex)
-                            self.selectedItemIndex = nil
+                VStack {
+                    HStack {
+                        Spacer()
+
+                        Button {
+                            itemToDiscount = selectedItem
+                        } label: {
+                            Image(systemName: "seal.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 18.0, height: 18.0)
+                                .overlay {
+                                    Text("%")
+                                        .font(.footnote)
+                                        .foregroundStyle(.white)
+                                }
                         }
-                    } label: {
-                        Image(systemName: selectedItem.canDecreaseQuantity ? "minus" : "trash")
-                            .foregroundStyle(selectedItem.canDecreaseQuantity ? .black : .red)
-                            .frame(width: 18.0, height: 18.0)
+                        .buttonStyle(.glass)
+                        .controlSize(.large)
                     }
-                    .buttonStyle(.glass)
-                    .buttonBorderShape(.circle)
-                    .controlSize(.large)
 
-                    Spacer()
+                    HStack {
+                        Button {
+                            if selectedItem.canDecreaseQuantity {
+                                form.items[selectedItemIndex].quantity.amount -= 1
+                            } else {
+                                selectedVariants.remove(at: selectedItemIndex)
+                                form.items.remove(at: selectedItemIndex)
+                                self.selectedItemIndex = nil
+                            }
+                        } label: {
+                            Image(systemName: selectedItem.canDecreaseQuantity ? "minus" : "trash")
+                                .foregroundStyle(selectedItem.canDecreaseQuantity ? .black : .red)
+                                .frame(width: 18.0, height: 18.0)
+                        }
+                        .buttonStyle(.glass)
+                        .buttonBorderShape(.circle)
+                        .controlSize(.large)
 
-                    Button {
+                        Spacer()
 
-                    } label: {
-                        Text(selectedItem.quantity.amount, format: .number)
+                        Button {
+
+                        } label: {
+                            Text(selectedItem.quantity.amount, format: .number)
+                        }
+                        .buttonStyle(.glass)
+                        .controlSize(.large)
+
+                        Spacer()
+
+                        Button {
+                            form.items[selectedItemIndex].quantity.amount += 1
+                        } label: {
+                            Image(systemName: "plus")
+                                .frame(width: 18.0, height: 18.0)
+                        }
+                        .buttonStyle(.glass)
+                        .buttonBorderShape(.circle)
+                        .controlSize(.large)
+                        .disabled(!selectedItem.canIncreaseQuantity)
                     }
-                    .buttonStyle(.glass)
-                    .controlSize(.large)
-
-                    Spacer()
-
-                    Button {
-                        form.items[selectedItemIndex].quantity.amount += 1
-                    } label: {
-                        Image(systemName: "plus")
-                            .frame(width: 18.0, height: 18.0)
-                    }
-                    .buttonStyle(.glass)
-                    .buttonBorderShape(.circle)
-                    .controlSize(.large)
-                    .disabled(!selectedItem.canIncreaseQuantity)
                 }
                 .padding(.horizontal, 16.0)
             }
         }
-        .listRowSpacing(16.0)
+        .sheet(item: $itemToDiscount) { item in
+            NavigationStack {
+                OrderCreateFormItemDiscountView(item: item)
+            }
+        }
         .navigationTitle("Numéro de commande")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -193,8 +250,13 @@ struct OrderCreateFormView: View {
 
             let orderCustomer = OrderCustomer(fullName: customer.fullName)
             let order = Order(warehouse: warehouse, customer: orderCustomer)
-            let orderItems = form.items.map {
-                OrderVariant(
+
+            order.discounts = form.discounts.map {
+                OrderDiscount(order: order, name: $0.name, type: $0.type, value: $0.value)
+            }
+
+            order.variants = form.items.map {
+                let item = OrderVariant(
                     reference    : $0.reference,
                     order        : order,
                     sku          : $0.sku,
@@ -204,9 +266,17 @@ struct OrderCreateFormView: View {
                     tax          : $0.tax,
                     quantity     : $0.quantity
                 )
-            }
 
-            order.variants = orderItems
+                item.attributes = $0.attributes.map {
+                    OrderVariantAttribute(item: item, key: $0.key, value: $0.value)
+                }
+
+                item.discounts = $0.discounts.map {
+                    OrderItemDiscount(item: item, name: $0.name, type: $0.type, value: $0.value)
+                }
+
+                return item
+            }
 
             // Update product variant quantity
             for item in form.items {

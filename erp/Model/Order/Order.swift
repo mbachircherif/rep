@@ -18,12 +18,19 @@ final class Order {
 
     var customer: OrderCustomer
 
-    @Relationship(deleteRule: .cascade, inverse: \OrderVariant.order)
-    var variants: [OrderVariant] = []
-
     var status: Status
 
     var createdAt: Date = Date()
+
+    // MARK: - Relationships
+
+    @Relationship(deleteRule: .cascade, inverse: \OrderDiscount.order)
+    var discounts: [OrderDiscount] = []
+
+    @Relationship(deleteRule: .cascade, inverse: \OrderVariant.order)
+    var variants: [OrderVariant] = []
+
+    // MARK: - Business
 
     var subtotal: Decimal {
         variants.reduce(Decimal(0)) { $0 + $1.subtotal }

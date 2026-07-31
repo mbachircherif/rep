@@ -16,8 +16,10 @@ final class OrderCreateForm {
 
     var items: [OrderFormItem] = []
 
+    var discounts: [OrderFormDiscount] = []
+
     var subtotal: Decimal {
-        items.reduce(Decimal(0)) { $0 + $1.subtotal }
+        items.reduce(Decimal(0)) { $0 + $1.total }
     }
 
     var taxes: [Tax : Decimal] {
@@ -34,12 +36,65 @@ final class OrderCreateForm {
         return taxesMap
     }
 
+    var totalDiscount: Decimal {
+        var base  : Decimal = subtotal
+        var total : Decimal = 0
+
+        // Apply discounts in cascade, accumulating the amount taken off at each step.
+        for discount in discounts {
+            let priceOff: Decimal
+            switch discount.type {
+            case .fixed:
+                priceOff = discount.value
+            case .percentage:
+                priceOff = base * discount.value
+            }
+
+            total += priceOff
+            base  -= priceOff
+        }
+
+        return total
+    }
+
     var total: Decimal {
-        items.reduce(Decimal(0)) { $0 + $1.total }
+        var base: Decimal = 0
+
+        for item in items {
+            base += item.total
+        }
+
+        // Apply discounts in cascade
+        for discount in discounts {
+            switch discount.type {
+            case .fixed:
+                base -= discount.value
+            case .percentage:
+                base -= base * discount.value
+            }
+        }
+
+        return base
+    }
+
+    var currency: Currency
+
+    func priceOff(for discount: OrderFormDiscount) -> Decimal {
+        switch discount.type {
+        case .fixed:
+            discount.value
+        case .percentage:
+            subtotal * discount.value
+        }
+    }
+
+    init(currency: Currency) {
+        self.currency = currency
     }
 }
 
-struct OrderFormCustomer {
+@Observable
+final class OrderFormCustomer {
 
     var customerID: PersistentIdentifier
 
@@ -51,11 +106,14 @@ struct OrderFormCustomer {
     }
 }
 
-struct OrderFormItem: Identifiable, Hashable, Equatable {
+@Observable
+final class OrderFormItem: Identifiable, Hashable, Equatable {
 
     var id: PersistentIdentifier {
         reference.id
     }
+
+    weak var form: OrderCreateForm?
 
     var reference: ProductVariant
 
@@ -64,8 +122,6 @@ struct OrderFormItem: Identifiable, Hashable, Equatable {
     var sku: String
 
     var position: Int
-
-    var attributes: [OrderFormItemAttribute] = []
 
     var costPrice: Decimal
 
@@ -77,12 +133,37 @@ struct OrderFormItem: Identifiable, Hashable, Equatable {
 
     var tax: Tax
 
+    // Relations
+
+    var attributes: [OrderFormItemAttribute] = []
+
+    var discounts: [OrderFormItemDiscount] = []
+
+    // Computed properties
+
+    // TODO: Define what is a total and a subtotal for an item and an order.
     var subtotal: Decimal {
-        (sellingPrice - (sellingPrice * tax.rate)) * quantity.amount
+        sellingPrice / (1 + tax.rate) * quantity.amount
     }
 
     var total: Decimal {
-        sellingPrice * quantity.amount
+        var base: Decimal = 0
+
+        base += sellingPrice / (1 + tax.rate)
+
+        // Cutting off discounts
+        for discount in discounts {
+            switch discount.type {
+            case .fixed:
+                base -= discount.value
+            case .percentage:
+                base -= discount.value * base
+            }
+        }
+
+        base = base * quantity.amount
+
+        return base
     }
 
     var canDecreaseQuantity: Bool {
@@ -97,29 +178,118 @@ struct OrderFormItem: Identifiable, Hashable, Equatable {
         lhs.id == rhs.id
     }
 
+    func priceOff(for discount: OrderFormItemDiscount) -> Decimal {
+        switch discount.type {
+        case .fixed:
+            discount.value * quantity.amount
+        case .percentage:
+            sellingPrice / (1 + tax.rate) * discount.value * quantity.amount
+        }
+    }
+
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
 
-    init(from productVariant: ProductVariant) {
-        self.reference        = productVariant
-        self.name             = productVariant.product?.name ?? ""
-        self.sku              = productVariant.sku
-        self.position         = productVariant.position
-        self.attributes       = productVariant.attributes
-            .sorted { $0.position < $1.position }
-            .map { OrderFormItemAttribute(key: $0.optionValue?.option?.name ?? "", value: $0.optionValue?.name ?? "") }
+    init(from productVariant: ProductVariant, form: OrderCreateForm) {
+        self.form         = form
+        self.reference    = productVariant
+        self.name         = productVariant.product?.name ?? ""
+        self.sku          = productVariant.sku
+        self.position     = productVariant.position
         self.costPrice    = productVariant.costPrice
         self.sellingPrice = productVariant.sellingPrice
-        self.quantity     = Stock(amount: 0, unit: productVariant.stock.unit)
+        self.quantity     = Stock(amount : 0, unit : productVariant.stock.unit)
         self.stock        = productVariant.stock
         self.tax          = productVariant.tax
+        self.attributes   = productVariant.attributes
+            .sorted { $0.position < $1.position }
+            .map { OrderFormItemAttribute(key: $0.optionValue?.option?.name ?? "", value: $0.optionValue?.name ?? "", item: self) }
     }
 }
 
-struct OrderFormItemAttribute: Hashable {
+@Observable
+final class OrderFormItemAttribute: Hashable {
+
+    weak var item: OrderFormItem?
 
     let key: String
 
     let value: String
+
+    init(key: String, value: String, item: OrderFormItem) {
+        self.item  = item
+        self.key   = key
+        self.value = value
+    }
+
+    static func == (lhs: OrderFormItemAttribute, rhs: OrderFormItemAttribute) -> Bool {
+        lhs.key == rhs.value
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(key)
+    }
+}
+
+@Observable
+final class OrderFormItemDiscount: Identifiable, Hashable {
+
+    weak var item: OrderFormItem?
+
+    var id: String {
+        name
+    }
+
+    let name: String
+
+    let type: ValueType
+
+    let value: Decimal
+
+    init(item: OrderFormItem, name: String, type: ValueType, value: Decimal) {
+        self.item  = item
+        self.name  = name
+        self.type  = type
+        self.value = value
+    }
+
+    static func == (lhs: OrderFormItemDiscount, rhs: OrderFormItemDiscount) -> Bool {
+        lhs.name == rhs.name
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+    }
+}
+
+@Observable
+final class OrderFormDiscount: Identifiable, Hashable {
+
+    weak var form: OrderCreateForm?
+
+    var id: String {
+        name
+    }
+
+    let name: String
+
+    let type: ValueType
+
+    let value: Decimal
+
+    init(form: OrderCreateForm, name: String, type: ValueType, value: Decimal) {
+        self.form  = form
+        self.name  = name
+        self.type  = type
+        self.value = value
+    }
+
+    static func == (lhs: OrderFormDiscount, rhs: OrderFormDiscount) -> Bool {
+        lhs.name == rhs.name
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+    }
 }

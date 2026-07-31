@@ -56,17 +56,24 @@ struct DashboardView: View {
     var body: some View {
         ScrollView(.vertical) {
             LazyVStack(spacing: 24.0) {
-                HStack {
-                    Text(currentMonthNetSales, format: .currency(code: "EUR"))
-                        .font(.system(size: 26.0, weight: .semibold, design: .rounded))
+                VStack(spacing: 6.0) {
+                    Text("Chiffre d'affaire")
+                        .font(.system(size: 11, weight: .regular, design: .rounded))
+                        .foregroundStyle(.gray)
 
                     Spacer()
 
-                    Text(0.2288, format: .percent.sign(strategy: .always()))
-                        .font(.system(size: 23.0, weight: .medium, design: .rounded))
-                        .foregroundStyle(.green)
+                    Text(currentMonthNetSales, format: .currency(code: "EUR"))
+                        .lineLimit(1)
+                        .foregroundStyle(.black)
+                        .font(.system(size: 32.0, weight: .bold, design: .rounded))
 
+                    Text(0.2288, format: .percent.sign(strategy: .always()))
+                        .font(.system(size: 16.0, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.green)
                 }
+
+                Spacer()
 
                 Chart(values, id: \.day) { item in
                     LineMark(
@@ -236,6 +243,7 @@ struct DashboardView: View {
 
                         Spacer()
                     }
+                    .padding(.bottom, 16.0)
                 }
 
                 Spacer()

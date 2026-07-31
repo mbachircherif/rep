@@ -39,7 +39,7 @@ struct OrderListView: View {
                 }
             }
         }
-        .sheet(isPresented: $isOrderCreatedFormPresented) {
+        .fullScreenCover(isPresented: $isOrderCreatedFormPresented) {
             NavigationStack {
                 OrderCreateFormView(warehouse: warehouse)
             }

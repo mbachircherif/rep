@@ -19,8 +19,6 @@ final class OrderVariant {
 
     var name: String
 
-    var attributes: [OrderVariantAttribute] = []
-
     var costPrice: Decimal
 
     var sellingPrice: Decimal
@@ -28,6 +26,12 @@ final class OrderVariant {
     var tax: Tax
 
     var quantity: Stock
+
+    @Relationship(deleteRule: .cascade, inverse: \OrderVariantAttribute.item)
+    var attributes: [OrderVariantAttribute] = []
+
+    @Relationship(deleteRule: .cascade, inverse: \OrderItemDiscount.item)
+    var discounts: [OrderItemDiscount] = []
 
     var subtotal: Decimal {
         let total = total

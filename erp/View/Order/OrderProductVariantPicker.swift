@@ -31,7 +31,7 @@ struct OrderProductVariantPicker: View {
                 form.items.remove(at: variantIndex)
             } else {
                 selectedVariants.append(variant)
-                form.items.append(OrderFormItem(from: variant))
+                form.items.append(OrderFormItem(from: variant, form: form))
             }
         } label: { variant in
             HStack {
