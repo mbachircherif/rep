@@ -99,7 +99,7 @@ struct OrderCreateFormItemView: View {
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(.white, in: .rect(cornerRadius: 24.0))
-                    .overlay(Color(white: 0.935), in: .rect(cornerRadius: 24.0).stroke())
+                    .overlay(Color(white: 0.94), in: .rect(cornerRadius: 24.0).stroke())
                 }
 
                 Section {
@@ -171,7 +171,7 @@ struct OrderCreateFormItemView: View {
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(.white, in: .rect(cornerRadius: 24.0))
-                        .overlay(Color(white: 0.935), in: .rect(cornerRadius: 24.0).stroke())
+                        .overlay(Color(white: 0.94), in: .rect(cornerRadius: 24.0).stroke())
 
                         // Footer
                         Text("L'application des remises se fait en cascade et par ordre de position.")
@@ -194,7 +194,7 @@ struct OrderCreateFormItemView: View {
 
                             Divider()
                                 .overlay(Color(white: 0.9))
-                                .padding(.horizontal, -12.0)
+                                .padding(.horizontal, -12.5)
 
                             Grid(verticalSpacing: 12.0) {
                                 GridRow {
@@ -266,12 +266,12 @@ struct OrderCreateFormItemView: View {
                         .padding(.horizontal)
                     }
                     .padding(1.0)
-                    .background(Color(white: 0.92), in: .rect(cornerRadius: 24.0))
+                    .background(Color(white: 0.93), in: .rect(cornerRadius: 24.0))
                 }
             }
             .padding(24)
         }
-        .background(Color(white: 0.95))
+        .background(Color(white: 0.96))
     }
 }
 
