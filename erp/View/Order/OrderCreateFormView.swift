@@ -125,6 +125,26 @@ struct OrderCreateFormView: View {
             }
 
             Section {
+                if let shipping = form.shipping {
+                    NavigationLink {
+                        OrderCreateFormShippingView(form: form)
+                    } label: {
+                        VStack {
+                            LabeledContent("Frais de livraison", value: shipping.cost, format: .currency(code: form.currency.rawValue))
+
+                            ForEach(shipping.taxes, id: \.name) { tax in
+                                LabeledContent(tax.name, value: tax.rate, format: .percent)
+                            }
+                        }
+                    }
+                } else {
+                    NavigationLink("Ajouter des frais de livraison") {
+                        OrderCreateFormShippingView(form: form)
+                    }
+                }
+            }
+
+            Section {
                 // Subtotal
                 LabeledContent("Sous-total (HT)", value: form.subtotal, format: .currency(code: form.currency.rawValue))
 
@@ -132,6 +152,13 @@ struct OrderCreateFormView: View {
                 LabeledContent("Remises") {
                     Text(form.totalDiscount, format: .currency(code: form.currency.rawValue))
                         .foregroundStyle(.indigo)
+                }
+
+                if let shipping = form.shipping {
+                    LabeledContent("Livraison") {
+                        Text(shipping.cost, format: .currency(code: shipping.form?.currency.rawValue ?? ""))
+                            .foregroundStyle(.yellow)
+                    }
                 }
 
                 // Taxes
@@ -273,6 +300,14 @@ struct OrderCreateFormView: View {
 
                 item.discounts = $0.discounts.map {
                     OrderItemDiscount(item: item, name: $0.name, type: $0.type, value: $0.value)
+                }
+
+                if let shipping = form.shipping {
+                    order.shipping = OrderShipping(
+                        order: order,
+                        cost:  shipping.cost,
+                        taxes: shipping.taxes
+                    )
                 }
 
                 return item

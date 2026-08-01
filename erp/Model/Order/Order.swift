@@ -27,6 +27,9 @@ final class Order {
     @Relationship(deleteRule: .cascade, inverse: \OrderDiscount.order)
     var discounts: [OrderDiscount] = []
 
+    @Relationship(deleteRule: .cascade, inverse: \OrderShipping.order)
+    var shipping: OrderShipping?
+
     @Relationship(deleteRule: .cascade, inverse: \OrderVariant.order)
     var variants: [OrderVariant] = []
 

@@ -18,6 +18,8 @@ final class OrderCreateForm {
 
     var discounts: [OrderFormDiscount] = []
 
+    var shipping: OrderFormShipping?
+
     var subtotal: Decimal {
         items.reduce(Decimal(0)) { $0 + $1.total }
     }
@@ -30,6 +32,16 @@ final class OrderCreateForm {
                 taxesMap[item.tax] = item.total * item.tax.rate + existingTax
             } else {
                 taxesMap[item.tax] = item.total * item.tax.rate
+            }
+        }
+
+        if let shipping {
+            for tax in shipping.taxes {
+                if let existingTax = taxesMap[tax] {
+                    taxesMap[tax] = shipping.cost * tax.rate + existingTax
+                } else {
+                    taxesMap[tax] = shipping.cost * tax.rate
+                }
             }
         }
 
@@ -71,6 +83,24 @@ final class OrderCreateForm {
                 base -= discount.value
             case .percentage:
                 base -= base * discount.value
+            }
+        }
+
+        // Apply shipping
+        if let shipping {
+            base += shipping.cost
+        }
+
+        // Apply taxes
+        // Apply product taxes
+        for item in items {
+            base += item.total * item.tax.rate
+        }
+
+        // Apply shipping taxes
+        if let shipping {
+            for tax in shipping.taxes {
+                base += shipping.cost * tax.rate
             }
         }
 
@@ -291,5 +321,21 @@ final class OrderFormDiscount: Identifiable, Hashable {
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(name)
+    }
+}
+
+@Observable
+final class OrderFormShipping {
+
+    weak var form: OrderCreateForm?
+
+    var cost: Decimal
+
+    var taxes: [Tax]
+
+    init(form: OrderCreateForm?, cost: Decimal, taxes: [Tax]) {
+        self.form  = form
+        self.cost  = cost
+        self.taxes = taxes
     }
 }

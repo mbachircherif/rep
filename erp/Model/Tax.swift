@@ -9,6 +9,9 @@ import Foundation
 
 struct Tax: Codable, Hashable {
 
+    // TODO: Delete hardcoded name.
+    var name: String = "TVA"
+
     var rate: Decimal
 
     var behavior: Behavior
