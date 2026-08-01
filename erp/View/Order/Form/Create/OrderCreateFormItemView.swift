@@ -103,60 +103,82 @@ struct OrderCreateFormItemView: View {
                 }
 
                 Section {
-                    VStack(spacing: 12.0) {
-                        HStack {
-                            Text("Discounts")
-                                .font(.system(size: 16.0, weight: .semibold, design: .rounded))
-                                .foregroundStyle(Color(white: 0.20))
+                    VStack(alignment: .leading, spacing: 12.0) {
+                        VStack(spacing: 12.0) {
+                            HStack {
+                                Text("Discounts")
+                                    .font(.system(size: 16.0, weight: .semibold, design: .rounded))
+                                    .foregroundStyle(Color(white: 0.20))
 
-                            Spacer()
+                                Spacer()
 
-                            Image(systemName: "ellipsis")
-                        }
-
-                        Divider()
-                            .overlay(Color(white: 0.9))
-                            .padding(.horizontal, -12.0)
-
-                        Grid(verticalSpacing: 4.0) {
-                            GridRow {
-                                HStack {
-                                    Text("Winter 27")
-                                        .font(.system(size: 16.0, weight: .regular, design: .rounded))
-                                        .foregroundStyle(.gray)
-
-                                    Spacer()
-
-                                    Text("-30%")
-                                        .font(.system(size: 16.0, weight: .medium, design: .rounded))
-                                        .foregroundStyle(.indigo)
-                                    //                                    .padding(EdgeInsets(top: 6.0, leading: 11.0, bottom: 6.0, trailing: 11.0))
-                                    //                                    .background(.indigo.opacity(0.1), in: .capsule)
-                                }
-                                .padding(EdgeInsets(top: 8.0, leading: 12.0, bottom: 8.0, trailing: 12.0))
+                                Image(systemName: "ellipsis")
                             }
 
-                            GridRow {
-                                HStack {
-                                    Text("Welcome")
-                                        .font(.system(size: 16.0, weight: .regular, design: .rounded))
-                                        .foregroundStyle(.gray)
+                            Divider()
+                                .overlay(Color(white: 0.9))
+                                .padding(.horizontal, -12.0)
 
-                                    Spacer()
+                            Grid(verticalSpacing: 4.0) {
+                                GridRow {
+                                    HStack(spacing: 12.0) {
+                                        Image(systemName: "square.grid.3x2.fill")
+                                            .resizable()
+                                            .rotationEffect(.degrees(90))
+                                            .scaledToFit()
+                                            .frame(width: 15.0, height: 15.0)
+                                            .foregroundStyle(.gray.opacity(0.5))
 
-                                    Text("-10%")
-                                        .font(.system(size: 16.0, weight: .medium, design: .rounded))
-                                        .foregroundStyle(.indigo)
+                                        Text("Winter 27")
+                                            .font(.system(size: 16.0, weight: .regular, design: .rounded))
+                                            .foregroundStyle(.gray)
+
+                                        Spacer()
+
+                                        Text("-30%")
+                                            .font(.system(size: 16.0, weight: .medium, design: .rounded))
+                                            .foregroundStyle(.indigo)
+                                        //                                    .padding(EdgeInsets(top: 6.0, leading: 11.0, bottom: 6.0, trailing: 11.0))
+                                        //                                    .background(.indigo.opacity(0.1), in: .capsule)
+                                    }
+                                    .padding(EdgeInsets(top: 8.0, leading: 12.0, bottom: 8.0, trailing: 12.0))
                                 }
-                                .padding(EdgeInsets(top: 8.0, leading: 12.0, bottom: 8.0, trailing: 12.0))
-                                .background(Color(white: 0.975), in: .containerRelative)
+
+                                GridRow {
+                                    HStack(spacing: 12.0) {
+                                        Image(systemName: "square.grid.3x2.fill")
+                                            .resizable()
+                                            .rotationEffect(.degrees(90))
+                                            .scaledToFit()
+                                            .frame(width: 15.0, height: 15.0)
+                                            .foregroundStyle(.gray.opacity(0.5))
+
+                                        Text("Welcome")
+                                            .font(.system(size: 16.0, weight: .regular, design: .rounded))
+                                            .foregroundStyle(.gray)
+
+                                        Spacer()
+
+                                        Text("-10%")
+                                            .font(.system(size: 16.0, weight: .medium, design: .rounded))
+                                            .foregroundStyle(.indigo)
+                                    }
+                                    .padding(EdgeInsets(top: 8.0, leading: 12.0, bottom: 8.0, trailing: 12.0))
+                                    .background(Color(white: 0.975), in: .containerRelative)
+                                }
                             }
                         }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(.white, in: .rect(cornerRadius: 24.0))
+                        .overlay(Color(white: 0.935), in: .rect(cornerRadius: 24.0).stroke())
+
+                        // Footer
+                        Text("L'application des remises se fait en cascade et par ordre de position.")
+                            .font(.system(size: 14.0, weight: .regular, design: .rounded))
+                            .foregroundStyle(.gray)
+                            .padding(.horizontal)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(.white, in: .rect(cornerRadius: 24.0))
-                    .overlay(Color(white: 0.935), in: .rect(cornerRadius: 24.0).stroke())
                 }
 
                 Section {
