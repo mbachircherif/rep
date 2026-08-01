@@ -60,10 +60,8 @@ struct OrderCreateFormView: View {
             // Variants
             ForEach(form.items.enumerated(), id: \.element) { index, item in
                 Section {
-                    Button {
-                        withAnimation(.smooth) {
-                            selectedItemIndex = index
-                        }
+                    NavigationLink {
+                        OrderCreateFormItemView(item: item)
                     } label: {
                         HStack(spacing: 16.0) {
                             ContainerRelativeShape()
