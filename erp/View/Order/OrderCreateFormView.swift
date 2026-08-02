@@ -44,7 +44,7 @@ struct OrderCreateFormView: View {
 
     var body: some View {
         ScrollView(.vertical) {
-            LazyVStack(spacing: 42.0) {
+            LazyVStack(spacing: 24.0) {
                 // Customer
                 /*
                  Section {
@@ -121,7 +121,7 @@ struct OrderCreateFormView: View {
                  }
                  */
                 Section {
-                    VStack(alignment: .leading, spacing: 20.0) {
+                    VStack(alignment: .leading, spacing: 24.0) {
                         HStack {
                             Text("Client")
                                 .font(.system(size: Constants.UI.sectionTitle, weight: .semibold, design: .rounded))
@@ -129,56 +129,63 @@ struct OrderCreateFormView: View {
 
                             Spacer()
                         }
-                        .padding(.horizontal)
 
                         Text("Sélectionner un client parmis votre portefeuille client.")
                             .font(.system(size: 16.0, weight: .regular, design: .rounded))
                             .foregroundStyle(.gray)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .background(.white, in: .rect(cornerRadius: 16.0))
-                            .padding(.horizontal)
 
-                        Button("Sélectionner un client") {
+                        HStack(spacing: 12.0) {
+                            Button {
 
+                            } label: {
+                                Image(systemName: "plus")
+                            }
+                            .buttonStyle(PrimaryIconButtonStyle())
+
+                            Text("Sélectionner un client")
+                                .font(.system(size: 16.0, weight: .medium, design: .rounded))
                         }
-                        .buttonStyle(SecondaryButtonStyle())
-                        .padding(.horizontal)
                     }
                 }
 
                 Divider()
 
                 Section {
-                    VStack(alignment: .leading, spacing: 20.0) {
+                    VStack(alignment: .leading, spacing: 24.0) {
                         HStack {
-                            Text("Produits")
+                            Text("Produit")
                                 .font(.system(size: Constants.UI.sectionTitle, weight: .semibold, design: .rounded))
                                 .foregroundStyle(Color(white: 0.20))
 
                             Spacer()
                         }
-                        .padding(.horizontal)
 
                         Text("Ajouter les produits qui vous souhaitez vendre afin de les configurer.")
                             .font(.system(size: 16.0, weight: .regular, design: .rounded))
                             .foregroundStyle(.gray)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal)
                             .background(.white, in: .rect(cornerRadius: 16.0))
 
-                        Button("Ajouter un produit") {
+                        HStack(spacing: 12.0) {
+                            Button {
 
+                            } label: {
+                                Image(systemName: "plus")
+                            }
+                            .buttonStyle(PrimaryIconButtonStyle())
+
+                            Text("Ajouter un produit")
+                                .font(.system(size: 16.0, weight: .medium, design: .rounded))
                         }
-                        .buttonStyle(SecondaryButtonStyle())
-                        .padding(.horizontal)
                     }
-                    .listRowBackground(Color.clear)
                 }
 
                 Divider()
 
                 Section {
-                    VStack(alignment: .leading, spacing: 20.0) {
+                    VStack(alignment: .leading, spacing: 24.0) {
                         HStack {
                             Text("Remises")
                                 .font(.system(size: Constants.UI.sectionTitle, weight: .semibold, design: .rounded))
@@ -186,52 +193,60 @@ struct OrderCreateFormView: View {
 
                             Spacer()
                         }
-                        .padding(.horizontal)
 
                         Text("Ajouter des remises sur votre produit. Lorem ispum dolor si amet.")
                             .font(.system(size: 16.0, weight: .regular, design: .rounded))
                             .foregroundStyle(.gray)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal)
                             .background(.white, in: .rect(cornerRadius: 16.0))
 
-                        Button("Ajouter une remise") {
+                        HStack(spacing: 12.0) {
+                            Button {
 
+                            } label: {
+                                Image(systemName: "plus")
+                            }
+                            .buttonStyle(PrimaryIconButtonStyle())
+
+                            Text("Ajouter une remise")
+                                .font(.system(size: 16.0, weight: .medium, design: .rounded))
                         }
-                        .buttonStyle(SecondaryButtonStyle())
-                        .padding(.horizontal)
                     }
-                    .listRowBackground(Color.clear)
                 }
 
                 Divider()
 
                 Section {
-                    VStack(alignment: .leading, spacing: 20.0) {
+                    VStack(alignment: .leading, spacing: 24.0) {
                         HStack {
-                            Text("Livraison")
+                            Label("Livraison", systemImage: "shippingbox")
                                 .font(.system(size: Constants.UI.sectionTitle, weight: .semibold, design: .rounded))
                                 .foregroundStyle(Color(white: 0.20))
 
                             Spacer()
                         }
-                        .padding(.horizontal)
 
                         Text("Ajouter une livraison à votre commande.")
                             .font(.system(size: 16.0, weight: .regular, design: .rounded))
                             .foregroundStyle(.gray)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal)
                             .background(.white, in: .rect(cornerRadius: 16.0))
 
-                        Button("Configurer une livraison") {
+                        HStack(spacing: 12.0) {
+                            Button {
 
+                            } label: {
+                                Image(systemName: "plus")
+                            }
+                            .buttonStyle(PrimaryIconButtonStyle())
+
+                            Text("Configurer une livraison")
+                                .font(.system(size: 16.0, weight: .medium, design: .rounded))
                         }
-                        .buttonStyle(SecondaryButtonStyle())
-                        .padding(.horizontal)
                     }
-                    .listRowBackground(Color.clear)
                 }
+
+                Divider()
 
                 //            Section {
                 //                if let shipping = form.shipping {
@@ -280,7 +295,7 @@ struct OrderCreateFormView: View {
                         .fontWeight(.medium)
                 }
             }
-            .padding()
+            .padding(24.0)
         }
 //        .scrollContentBackground(.hidden)
         .background(Color(white: 1))
