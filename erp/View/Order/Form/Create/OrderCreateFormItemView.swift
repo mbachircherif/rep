@@ -19,7 +19,7 @@ struct OrderCreateFormItemView: View {
 
     var body: some View {
         ScrollView(.vertical) {
-            LazyVStack(spacing: 36.0) {
+            LazyVStack(spacing: 48.0) {
                 Image("pocket")
                     .resizable()
                     .scaledToFit()
@@ -40,7 +40,7 @@ struct OrderCreateFormItemView: View {
                     VStack(alignment: .leading, spacing: 12.0) {
                         HStack {
                             Text("Attributs")
-                                .font(.system(size: 16.0, weight: .semibold, design: .rounded))
+                                .font(.system(size: Constants.UI.sectionTitle, weight: .semibold, design: .rounded))
                                 .foregroundStyle(Color(white: 0.20))
 
                             Spacer()
@@ -110,78 +110,96 @@ struct OrderCreateFormItemView: View {
                 }
 
                 Section {
-                    VStack(alignment: .leading, spacing: 12.0) {
+                    VStack(alignment: .leading, spacing: 16.0) {
                         HStack {
-                            Text("Discounts")
-                                .font(.system(size: 16.0, weight: .semibold, design: .rounded))
+                            Text("Remises")
+                                .font(.system(size: Constants.UI.sectionTitle, weight: .semibold, design: .rounded))
                                 .foregroundStyle(Color(white: 0.20))
 
                             Spacer()
 
-                            Button {
-                                discountToCreate = OrderFormItemDiscount(
-                                    name:  "",
-                                    type:  .percentage,
-                                    value: 0
-                                )
-                            } label: {
-                                Image(systemName: "plus")
+                            if !item.discounts.isEmpty {
+                                Button {
+                                    discountToCreate = OrderFormItemDiscount(
+                                        name:  "",
+                                        type:  .percentage,
+                                        value: 0
+                                    )
+                                } label: {
+                                    Image(systemName: "ellipsis")
+                                        .foregroundStyle(.gray)
+                                }
+                                .buttonStyle(.plain)
                             }
-                            .buttonStyle(.plain)
                         }
                         .padding(.horizontal)
 
-                        Grid(verticalSpacing: 12.0) {
-                            ForEach(item.discounts.enumerated(), id: \.element) { index, discount in
-                                if index > 0 {
-                                    Divider()
-                                        .overlay(Color(white: 0.85))
-                                }
+                        if item.discounts.isEmpty {
+                            Text("Ajouter des remises sur votre produit. Lorem ispum dolor si amet.")
+                                .font(.system(size: 16.0, weight: .regular, design: .rounded))
+                                .foregroundStyle(.gray)
+                                .padding(.horizontal)
 
-                                Button {
-                                    discountToUpdate = discount
-                                } label: {
-                                    GridRow {
-                                        HStack(spacing: 12.0) {
-                                            Image(systemName: "square.grid.3x2.fill")
-                                                .resizable()
-                                                .rotationEffect(.degrees(90))
-                                                .scaledToFit()
-                                                .frame(width: 15.0, height: 15.0)
-                                                .foregroundStyle(.gray.opacity(0.5))
+                            Button("Ajouter une remise") {
 
-                                            Text(discount.name)
-                                                .font(.system(size: 16.0, weight: .regular, design: .rounded))
-                                                .foregroundStyle(.gray)
+                            }
+                            .buttonStyle(SecondaryButtonStyle())
+                            .padding(.horizontal)
+                            .frame(maxWidth: .infinity)
+                        } else {
+                            Grid(verticalSpacing: 12.0) {
+                                ForEach(item.discounts.enumerated(), id: \.element) { index, discount in
+                                    if index > 0 {
+                                        Divider()
+                                            .overlay(Color(white: 0.85))
+                                    }
 
-                                            Spacer()
+                                    Button {
+                                        discountToUpdate = discount
+                                    } label: {
+                                        GridRow {
+                                            HStack(spacing: 12.0) {
+                                                Image(systemName: "square.grid.3x2.fill")
+                                                    .resizable()
+                                                    .rotationEffect(.degrees(90))
+                                                    .scaledToFit()
+                                                    .frame(width: 15.0, height: 15.0)
+                                                    .foregroundStyle(.gray.opacity(0.5))
 
-                                            Group {
-                                                switch discount.type {
-                                                case .fixed:
-                                                    Text(-discount.value, format: .currency(code: item.form?.currency.rawValue ?? "EUR"))
-                                                case .percentage:
-                                                    Text(-discount.value, format: .percent)
+                                                Text(discount.name)
+                                                    .font(.system(size: 16.0, weight: .regular, design: .rounded))
+                                                    .foregroundStyle(.gray)
+
+                                                Spacer()
+
+                                                Group {
+                                                    switch discount.type {
+                                                    case .fixed:
+                                                        Text(-discount.value, format: .currency(code: item.form?.currency.rawValue ?? "EUR"))
+                                                    case .percentage:
+                                                        Text(-discount.value, format: .percent)
+                                                    }
                                                 }
+                                                .font(.system(size: 16.0, weight: .medium, design: .rounded))
+                                                .foregroundStyle(.indigo)
                                             }
-                                            .font(.system(size: 16.0, weight: .medium, design: .rounded))
-                                            .foregroundStyle(.indigo)
                                         }
                                     }
                                 }
                             }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(.white, in: .rect(cornerRadius: 24.0))
+                            .overlay(Color(white: 0.94), in: .rect(cornerRadius: 24.0).stroke())
                         }
 
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(.white, in: .rect(cornerRadius: 24.0))
-                        .overlay(Color(white: 0.94), in: .rect(cornerRadius: 24.0).stroke())
-
-                        // Footer
-                        Text("L'application des remises se fait en cascade et par ordre de position.")
-                            .font(.system(size: 14.0, weight: .regular, design: .rounded))
-                            .foregroundStyle(.gray)
-                            .padding(.horizontal)
+                        if !item.discounts.isEmpty {
+                            // Footer
+                            Text("L'application des remises se fait en cascade et par ordre de position.")
+                                .font(.system(size: 14.0, weight: .regular, design: .rounded))
+                                .foregroundStyle(.gray)
+                                .padding(.horizontal)
+                        }
                     }
                 }
 
@@ -189,7 +207,7 @@ struct OrderCreateFormItemView: View {
                     VStack(alignment: .leading, spacing: 12.0) {
                         HStack {
                             Text("Summary")
-                                .font(.system(size: 16.0, weight: .semibold, design: .rounded))
+                                .font(.system(size: Constants.UI.sectionTitle, weight: .semibold, design: .rounded))
                                 .foregroundStyle(Color(white: 0.20))
 
                             Spacer()
@@ -271,7 +289,7 @@ struct OrderCreateFormItemView: View {
                     }
                 }
             }
-            .padding(24)
+            .padding(16.0)
         }
         .background(Color(white: 0.96))
         .sheet(item: $discountToCreate) { discount in
@@ -335,16 +353,16 @@ struct OrderCreateFormItemView: View {
             currency: .eur
         ),
         discounts: [
-            OrderFormItemDiscount(
-                name:  "Winter 27",
-                type: .percentage,
-                value: 0.3
-            ),
-            OrderFormItemDiscount(
-                name:  "Welcome",
-                type: .fixed,
-                value: 10.0
-            )
+//            OrderFormItemDiscount(
+//                name:  "Winter 27",
+//                type: .percentage,
+//                value: 0.3
+//            ),
+//            OrderFormItemDiscount(
+//                name:  "Welcome",
+//                type: .fixed,
+//                value: 10.0
+//            )
         ]
     )
 

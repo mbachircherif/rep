@@ -43,132 +43,247 @@ struct OrderCreateFormView: View {
     }
 
     var body: some View {
-        Form {
-            // Customer
-            Section {
-                NavigationLink {
-                    OrderCustomerPicker(warehouse: warehouse, form: form)
-                } label: {
-                    if let customer = form.customer {
-                        Text(customer.fullName)
-                    } else {
-                        Text("Select a customer")
+        ScrollView(.vertical) {
+            LazyVStack(spacing: 42.0) {
+                // Customer
+                /*
+                 Section {
+                 NavigationLink {
+                 OrderCustomerPicker(warehouse: warehouse, form: form)
+                 } label: {
+                 if let customer = form.customer {
+                 Text(customer.fullName)
+                 } else {
+                 Text("Select a customer")
+                 }
+                 }
+                 }
+                 */
+
+                // Variants
+                ForEach(form.items.enumerated(), id: \.element) { index, item in
+                    Section {
+                        NavigationLink {
+                            OrderCreateFormItemView(item: item)
+                        } label: {
+                            HStack(spacing: 16.0) {
+                                ContainerRelativeShape()
+                                    .fill(.quinary)
+                                    .aspectRatio(1, contentMode: .fit)
+                                    .frame(maxWidth: 50.0)
+
+                                VStack(alignment: .leading, spacing: 8.0) {
+                                    Text(item.name)
+                                        .foregroundStyle(.primary)
+                                        .font(.default)
+                                        .lineLimit(1)
+
+                                    Text(item.sku)
+                                        .foregroundStyle(.secondary)
+                                        .font(.footnote)
+                                        .lineLimit(1)
+                                }
+
+                                Spacer()
+
+                                VStack(alignment: .trailing, spacing: 8.0) {
+                                    Text("\(item.subtotal, format: .currency(code: warehouse.currency.rawValue)) (HT)")
+                                        .lineLimit(1)
+
+                                    Text("\(item.quantity.amount, format: .number) \(item.quantity.unit.symbol)")
+                                        .font(.footnote)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(1)
+                                }
+                            }
+                            .padding(12.0)
+                            .background(.white, in: .containerRelative)
+                        }
+                        .buttonStyle(.plain)
+                        .listRowBackground(selectedItemIndex == index ? Color.blue : nil)
+                        .listRowInsets(EdgeInsets(2.0))
+
+                        // Discounts
+                        ForEach(item.discounts) { discount in
+                            LabeledContent(discount.name) {
+                                Text(-item.priceOff(for: discount), format: .currency(code: form.currency.rawValue))
+                                    .foregroundStyle(.green)
+                            }
+                        }
                     }
                 }
-            }
 
-            // Variants
-            ForEach(form.items.enumerated(), id: \.element) { index, item in
+                /*
+                 Section {
+                 NavigationLink("Ajouter un variant") {
+                 OrderProductVariantPicker(warehouse: warehouse, form: form, selectedVariants: $selectedVariants)
+                 }
+                 }
+                 */
                 Section {
-                    NavigationLink {
-                        OrderCreateFormItemView(item: item)
-                    } label: {
-                        HStack(spacing: 16.0) {
-                            ContainerRelativeShape()
-                                .fill(.quinary)
-                                .aspectRatio(1, contentMode: .fit)
-                                .frame(maxWidth: 50.0)
-
-                            VStack(alignment: .leading, spacing: 8.0) {
-                                Text(item.name)
-                                    .foregroundStyle(.primary)
-                                    .font(.default)
-                                    .lineLimit(1)
-
-                                Text(item.sku)
-                                    .foregroundStyle(.secondary)
-                                    .font(.footnote)
-                                    .lineLimit(1)
-                            }
+                    VStack(alignment: .leading, spacing: 20.0) {
+                        HStack {
+                            Text("Client")
+                                .font(.system(size: Constants.UI.sectionTitle, weight: .semibold, design: .rounded))
+                                .foregroundStyle(Color(white: 0.20))
 
                             Spacer()
-
-                            VStack(alignment: .trailing, spacing: 8.0) {
-                                Text("\(item.subtotal, format: .currency(code: warehouse.currency.rawValue)) (HT)")
-                                    .lineLimit(1)
-
-                                Text("\(item.quantity.amount, format: .number) \(item.quantity.unit.symbol)")
-                                    .font(.footnote)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                            }
                         }
-                        .padding(12.0)
-                        .background(.white, in: .containerRelative)
-                    }
-                    .buttonStyle(.plain)
-                    .listRowBackground(selectedItemIndex == index ? Color.blue : nil)
-                    .listRowInsets(EdgeInsets(2.0))
+                        .padding(.horizontal)
 
-                    // Discounts
-                    ForEach(item.discounts) { discount in
-                        LabeledContent(discount.name) {
-                            Text(-item.priceOff(for: discount), format: .currency(code: form.currency.rawValue))
-                                .foregroundStyle(.green)
+                        Text("Sélectionner un client parmis votre portefeuille client.")
+                            .font(.system(size: 16.0, weight: .regular, design: .rounded))
+                            .foregroundStyle(.gray)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(.white, in: .rect(cornerRadius: 16.0))
+                            .padding(.horizontal)
+
+                        Button("Sélectionner un client") {
+
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
+                        .padding(.horizontal)
+                    }
+                }
+
+                Divider()
+
+                Section {
+                    VStack(alignment: .leading, spacing: 20.0) {
+                        HStack {
+                            Text("Produits")
+                                .font(.system(size: Constants.UI.sectionTitle, weight: .semibold, design: .rounded))
+                                .foregroundStyle(Color(white: 0.20))
+
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+
+                        Text("Ajouter les produits qui vous souhaitez vendre afin de les configurer.")
+                            .font(.system(size: 16.0, weight: .regular, design: .rounded))
+                            .foregroundStyle(.gray)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal)
+                            .background(.white, in: .rect(cornerRadius: 16.0))
+
+                        Button("Ajouter un produit") {
+
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
+                        .padding(.horizontal)
+                    }
+                    .listRowBackground(Color.clear)
+                }
+
+                Divider()
+
+                Section {
+                    VStack(alignment: .leading, spacing: 20.0) {
+                        HStack {
+                            Text("Remises")
+                                .font(.system(size: Constants.UI.sectionTitle, weight: .semibold, design: .rounded))
+                                .foregroundStyle(Color(white: 0.20))
+
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+
+                        Text("Ajouter des remises sur votre produit. Lorem ispum dolor si amet.")
+                            .font(.system(size: 16.0, weight: .regular, design: .rounded))
+                            .foregroundStyle(.gray)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal)
+                            .background(.white, in: .rect(cornerRadius: 16.0))
+
+                        Button("Ajouter une remise") {
+
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
+                        .padding(.horizontal)
+                    }
+                    .listRowBackground(Color.clear)
+                }
+
+                Divider()
+
+                Section {
+                    VStack(alignment: .leading, spacing: 20.0) {
+                        HStack {
+                            Text("Livraison")
+                                .font(.system(size: Constants.UI.sectionTitle, weight: .semibold, design: .rounded))
+                                .foregroundStyle(Color(white: 0.20))
+
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+
+                        Text("Ajouter une livraison à votre commande.")
+                            .font(.system(size: 16.0, weight: .regular, design: .rounded))
+                            .foregroundStyle(.gray)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal)
+                            .background(.white, in: .rect(cornerRadius: 16.0))
+
+                        Button("Configurer une livraison") {
+
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
+                        .padding(.horizontal)
+                    }
+                    .listRowBackground(Color.clear)
+                }
+
+                //            Section {
+                //                if let shipping = form.shipping {
+                //                    NavigationLink {
+                //                        OrderCreateFormShippingView(form: form)
+                //                    } label: {
+                //                        VStack {
+                //                            LabeledContent("Frais de livraison", value: shipping.cost, format: .currency(code: form.currency.rawValue))
+                //
+                //                            ForEach(shipping.taxes, id: \.name) { tax in
+                //                                LabeledContent(tax.name, value: tax.rate, format: .percent)
+                //                            }
+                //                        }
+                //                    }
+                //                } else {
+                //                    NavigationLink("Ajouter des frais de livraison") {
+                //                        OrderCreateFormShippingView(form: form)
+                //                    }
+                //                }
+                //            }
+
+                Section {
+                    // Subtotal
+                    LabeledContent("Sous-total (HT)", value: form.subtotal, format: .currency(code: form.currency.rawValue))
+
+
+                    LabeledContent("Remises") {
+                        Text(form.totalDiscount, format: .currency(code: form.currency.rawValue))
+                            .foregroundStyle(.indigo)
+                    }
+
+                    if let shipping = form.shipping {
+                        LabeledContent("Livraison") {
+                            Text(shipping.cost, format: .currency(code: shipping.form?.currency.rawValue ?? ""))
+                                .foregroundStyle(.yellow)
                         }
                     }
-                }
-            }
 
-            Section {
-                NavigationLink("Ajouter un variant") {
-                    OrderProductVariantPicker(warehouse: warehouse, form: form, selectedVariants: $selectedVariants)
-                }
-            }
-
-            Section {
-                NavigationLink("Ajouter une remise") {
-                    OrderCreateFormDiscountList(form: form)
-                }
-            }
-
-            Section {
-                if let shipping = form.shipping {
-                    NavigationLink {
-                        OrderCreateFormShippingView(form: form)
-                    } label: {
-                        VStack {
-                            LabeledContent("Frais de livraison", value: shipping.cost, format: .currency(code: form.currency.rawValue))
-
-                            ForEach(shipping.taxes, id: \.name) { tax in
-                                LabeledContent(tax.name, value: tax.rate, format: .percent)
-                            }
-                        }
+                    // Taxes
+                    ForEach(Array(form.taxes), id: \.key) { tax, amount in
+                        LabeledContent("TVA (\(tax.rate, format: .percent))", value: amount, format: .currency(code: warehouse.currency.rawValue))
                     }
-                } else {
-                    NavigationLink("Ajouter des frais de livraison") {
-                        OrderCreateFormShippingView(form: form)
-                    }
+
+                    // Total
+                    LabeledContent("Total", value: form.total, format: .currency(code: warehouse.currency.rawValue))
+                        .fontWeight(.medium)
                 }
             }
-
-            Section {
-                // Subtotal
-                LabeledContent("Sous-total (HT)", value: form.subtotal, format: .currency(code: form.currency.rawValue))
-
-
-                LabeledContent("Remises") {
-                    Text(form.totalDiscount, format: .currency(code: form.currency.rawValue))
-                        .foregroundStyle(.indigo)
-                }
-
-                if let shipping = form.shipping {
-                    LabeledContent("Livraison") {
-                        Text(shipping.cost, format: .currency(code: shipping.form?.currency.rawValue ?? ""))
-                            .foregroundStyle(.yellow)
-                    }
-                }
-
-                // Taxes
-                ForEach(Array(form.taxes), id: \.key) { tax, amount in
-                    LabeledContent("TVA (\(tax.rate, format: .percent))", value: amount, format: .currency(code: warehouse.currency.rawValue))
-                }
-
-                // Total
-                LabeledContent("Total", value: form.total, format: .currency(code: warehouse.currency.rawValue))
-                    .fontWeight(.medium)
-            }
+            .padding()
         }
+//        .scrollContentBackground(.hidden)
+        .background(Color(white: 1))
         .safeAreaBar(edge: .bottom, spacing: 16.0) {
             if let selectedItemIndex {
 
@@ -324,5 +439,13 @@ struct OrderCreateFormView: View {
         } catch {
             print(error.localizedDescription)
         }
+    }
+}
+
+#Preview {
+    NavigationStack {
+        OrderCreateFormView(warehouse: Warehouse(user: User(fullname: "Tes Test")))
+            .navigationTitle("Commande")
+            .navigationBarTitleDisplayMode(.inline)
     }
 }
