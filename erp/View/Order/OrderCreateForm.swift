@@ -221,7 +221,7 @@ final class OrderFormItem: Identifiable, Hashable, Equatable {
         hasher.combine(id)
     }
 
-    init(from productVariant: ProductVariant, form: OrderCreateForm) {
+    init(from productVariant: ProductVariant, form: OrderCreateForm, discounts: [OrderFormItemDiscount] = []) {
         self.form         = form
         self.reference    = productVariant
         self.name         = productVariant.product?.name ?? ""
@@ -235,6 +235,7 @@ final class OrderFormItem: Identifiable, Hashable, Equatable {
         self.attributes   = productVariant.attributes
             .sorted { $0.position < $1.position }
             .map { OrderFormItemAttribute(key: $0.optionValue?.option?.name ?? "", value: $0.optionValue?.name ?? "", item: self) }
+        self.discounts    = discounts
     }
 }
 
@@ -263,22 +264,19 @@ final class OrderFormItemAttribute: Hashable {
 }
 
 @Observable
-final class OrderFormItemDiscount: Identifiable, Hashable {
-
-    weak var item: OrderFormItem?
+final class OrderFormItemDiscount: Discount, Identifiable, Hashable {
 
     var id: String {
         name
     }
 
-    let name: String
+    var name: String
 
-    let type: ValueType
+    var type: ValueType
 
-    let value: Decimal
+    var value: Decimal
 
-    init(item: OrderFormItem, name: String, type: ValueType, value: Decimal) {
-        self.item  = item
+    init(name: String, type: ValueType, value: Decimal) {
         self.name  = name
         self.type  = type
         self.value = value
@@ -294,7 +292,7 @@ final class OrderFormItemDiscount: Identifiable, Hashable {
 }
 
 @Observable
-final class OrderFormDiscount: Identifiable, Hashable {
+final class OrderFormDiscount: Discount, Identifiable, Hashable {
 
     weak var form: OrderCreateForm?
 
@@ -302,11 +300,11 @@ final class OrderFormDiscount: Identifiable, Hashable {
         name
     }
 
-    let name: String
+    var name: String
 
-    let type: ValueType
+    var type: ValueType
 
-    let value: Decimal
+    var value: Decimal
 
     init(form: OrderCreateForm, name: String, type: ValueType, value: Decimal) {
         self.form  = form

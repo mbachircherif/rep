@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class OrderItemDiscount {
+final class OrderItemDiscount: Discount {
 
     var item: OrderVariant
 

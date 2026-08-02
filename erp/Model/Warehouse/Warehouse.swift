@@ -21,8 +21,8 @@ final class Warehouse {
     @Relationship(deleteRule: .cascade, inverse: \Customer.warehouse)
     var customers: [Customer] = []
 
-    @Relationship(deleteRule: .cascade, inverse: \Discount.warehouse)
-    var discounts: [Discount] = []
+    @Relationship(deleteRule: .cascade, inverse: \WarehouseDiscount.warehouse)
+    var discounts: [WarehouseDiscount] = []
 
     @Relationship(deleteRule: .cascade, inverse: \Product.warehouse)
     var products: [Product] = []

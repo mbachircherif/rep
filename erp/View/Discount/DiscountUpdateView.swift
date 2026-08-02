@@ -1,18 +1,18 @@
 //
-//  DiscountCreateForm.swift
+//  DiscountUpdateView.swift
 //  erp
 //
-//  Created by Mohamed BACHIR-CHERIF on 31/07/2026.
+//  Created by Mohamed BACHIR-CHERIF on 02/08/2026.
 //
 
 import SwiftUI
 
-struct DiscountCreateForm: View {
+struct DiscountUpdateView: View {
 
     @Environment(\.dismiss)
     private var dismiss
 
-    struct CreateForm {
+    struct UpdateForm {
 
         // TODO: Use Field
         var name: String = ""
@@ -27,9 +27,14 @@ struct DiscountCreateForm: View {
     }
 
     @State
-    private var form = CreateForm()
+    private var form = UpdateForm()
 
-    var onCreate: (CreateForm) -> Void
+    var onUpdate: (UpdateForm) -> Void
+
+    init<T>(discount: T, onUpdate: @escaping (UpdateForm) -> Void) where T : Discount {
+        self._form = State(wrappedValue: UpdateForm(name: discount.name, type: discount.type, value: discount.value))
+        self.onUpdate = onUpdate
+    }
 
     var body: some View {
         Form {
@@ -58,12 +63,11 @@ struct DiscountCreateForm: View {
 
             Section {
                 Button {
-                    onCreate(form)
+                    onUpdate(form)
                 } label: {
                     Text("Sauvegarder")
                 }
                 .buttonStyle(PrimaryButtonStyle())
-                .disabled(!form.isValid)
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
             }

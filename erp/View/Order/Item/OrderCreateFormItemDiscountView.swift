@@ -51,7 +51,6 @@ struct OrderCreateFormItemDiscountView: View {
             NavigationStack {
                 DiscountCreateForm { form in
                     let discount = OrderFormItemDiscount(
-                        item:  item,
                         name:  form.name,
                         type:  form.type,
                         value: form.value

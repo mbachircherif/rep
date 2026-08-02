@@ -2,28 +2,17 @@
 //  Discount.swift
 //  erp
 //
-//  Created by Mohamed BACHIR-CHERIF on 31/07/2026.
+//  Created by Mohamed BACHIR-CHERIF on 02/08/2026.
 //
 
 import Foundation
-import SwiftData
 
-@Model
-final class Discount {
+protocol Discount {
 
-    var warehouse: Warehouse
+    var name:  String    { get set }
 
-    @Attribute(.unique)
-    var name: String
+    var type:  ValueType { get set }
 
-    var type: ValueType
-
-    var amount: Decimal
-
-    init(warehouse: Warehouse, name: String, type: ValueType, amount: Decimal) {
-        self.warehouse = warehouse
-        self.name      = name
-        self.type      = type
-        self.amount    = amount
-    }
+    var value: Decimal   { get set }
 }
+
