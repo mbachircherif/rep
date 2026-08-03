@@ -14,7 +14,7 @@ struct PrimaryButtonStyle: ButtonStyle {
             .label
             .font(.system(size: 18.0, weight: .semibold, design: .rounded))
             .foregroundStyle(.white)
-            .padding()
+            .padding(12.0)
             .frame(maxWidth: .infinity)
             .background(Color(hex: "#3b82f6")!, in: .capsule)
             .overlay(
