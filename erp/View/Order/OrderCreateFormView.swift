@@ -185,9 +185,7 @@ struct OrderCreateFormView: View {
                             Spacer()
 
 
-                            Text("Modifier")
-                                .font(.system(size: 16.0, weight: .semibold, design: .rounded))
-                                .foregroundStyle(Color(hex: "#3b82f6")!)
+                            Image(systemName: "ellipsis")
                         }
 
                         HStack(spacing: 16.0) {
@@ -216,6 +214,10 @@ struct OrderCreateFormView: View {
                                     .font(.system(size: 14.0, weight: .regular))
                                     .foregroundStyle(.gray)
                             }
+
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 14.0, weight: .semibold))
+                                .foregroundStyle(Color(white: 0.75))
                         }
 
                         HStack(spacing: 16.0) {
@@ -244,6 +246,10 @@ struct OrderCreateFormView: View {
                                     .font(.system(size: 14.0, weight: .regular))
                                     .foregroundStyle(.gray)
                             }
+
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 14.0, weight: .semibold))
+                                .foregroundStyle(Color(white: 0.75))
                         }
                     }
                 }
@@ -300,36 +306,27 @@ struct OrderCreateFormView: View {
                             }
 
                             Spacer()
-
-                            Text("Modifier")
-                                .font(.system(size: 16.0, weight: .semibold, design: .rounded))
-                                .foregroundStyle(Color(hex: "#3b82f6")!)
                         }
 
-                        Grid(verticalSpacing: 24.0) {
-                            GridRow {
-                                Text("Shipping")
-                                    .font(.system(size: 16.0))
+                        HStack(spacing: 16.0) {
+                            VStack(alignment: .leading, spacing: 4.0) {
+                                Text("UPS")
+                                    .font(.system(size: 16.0, weight: .semibold))
                                     .foregroundStyle(Color(white: 0.25))
-                                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                                Text(23.0, format: .currency(code: "EUR"))
-                                    .font(.system(size: 16.0, weight: .medium))
+                                Text("Livraison")
+                                    .font(.system(size: 16.0))
                                     .foregroundStyle(.gray)
-                                    .frame(maxWidth: .infinity, alignment: .trailing)
-                            }
-
-                            GridRow {
-                                Text("Tax")
-                                    .font(.system(size: 16.0))
-                                    .foregroundStyle(Color(white: 0.25))
                                     .frame(maxWidth: .infinity, alignment: .leading)
-
-                                Text(6.83, format: .currency(code: "EUR"))
-                                    .font(.system(size: 16.0, weight: .medium))
-                                    .foregroundStyle(Color(hex: "#78350f")!)
-                                    .frame(maxWidth: .infinity, alignment: .trailing)
                             }
+
+                            Text(23.0, format: .currency(code: "EUR"))
+                                .font(.system(size: 16.0, weight: .medium))
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 14.0, weight: .semibold))
+                                .foregroundStyle(Color(white: 0.75))
                         }
                     }
                 }
