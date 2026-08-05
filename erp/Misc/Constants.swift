@@ -11,6 +11,6 @@ enum Constants {
 
     enum UI {
 
-        static let sectionTitle: CGFloat = 20.0
+        static let sectionTitle: CGFloat = 16.0
     }
 }

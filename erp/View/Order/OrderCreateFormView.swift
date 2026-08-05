@@ -44,22 +44,7 @@ struct OrderCreateFormView: View {
 
     var body: some View {
         ScrollView(.vertical) {
-            LazyVStack(spacing: 24.0) {
-                // Customer
-                /*
-                 Section {
-                 NavigationLink {
-                 OrderCustomerPicker(warehouse: warehouse, form: form)
-                 } label: {
-                 if let customer = form.customer {
-                 Text(customer.fullName)
-                 } else {
-                 Text("Select a customer")
-                 }
-                 }
-                 }
-                 */
-
+            VStack(spacing: 32.0) {
                 VStack(spacing: 8.0) {
                     Text("Numéro")
                         .font(.system(size: 14.0, weight: .regular))
@@ -70,312 +55,351 @@ struct OrderCreateFormView: View {
                 }
 
                 Spacer()
-                Spacer()
 
-                // Variants
-                ForEach(form.items.enumerated(), id: \.element) { index, item in
-                    Section {
-                        NavigationLink {
-                            OrderCreateFormItemView(item: item)
-                        } label: {
-                            HStack(spacing: 16.0) {
-                                ContainerRelativeShape()
-                                    .fill(.quinary)
-                                    .aspectRatio(1, contentMode: .fit)
-                                    .frame(maxWidth: 50.0)
+                VStack(spacing: 32.0) {
+                    // Customer
+                    /*
+                     Section {
+                     NavigationLink {
+                     OrderCustomerPicker(warehouse: warehouse, form: form)
+                     } label: {
+                     if let customer = form.customer {
+                     Text(customer.fullName)
+                     } else {
+                     Text("Select a customer")
+                     }
+                     }
+                     }
+                     */
 
-                                VStack(alignment: .leading, spacing: 8.0) {
-                                    Text(item.name)
-                                        .foregroundStyle(.primary)
-                                        .font(.default)
-                                        .lineLimit(1)
+                    // Variants
+                    ForEach(form.items.enumerated(), id: \.element) { index, item in
+                        Section {
+                            NavigationLink {
+                                OrderCreateFormItemView(item: item)
+                            } label: {
+                                HStack(spacing: 16.0) {
+                                    ContainerRelativeShape()
+                                        .fill(.quinary)
+                                        .aspectRatio(1, contentMode: .fit)
+                                        .frame(maxWidth: 50.0)
 
-                                    Text(item.sku)
-                                        .foregroundStyle(.secondary)
-                                        .font(.footnote)
-                                        .lineLimit(1)
+                                    VStack(alignment: .leading, spacing: 8.0) {
+                                        Text(item.name)
+                                            .foregroundStyle(.primary)
+                                            .font(.default)
+                                            .lineLimit(1)
+
+                                        Text(item.sku)
+                                            .foregroundStyle(.secondary)
+                                            .font(.footnote)
+                                            .lineLimit(1)
+                                    }
+
+                                    Spacer()
+
+                                    VStack(alignment: .trailing, spacing: 8.0) {
+                                        Text("\(item.subtotal, format: .currency(code: warehouse.currency.rawValue)) (HT)")
+                                            .lineLimit(1)
+
+                                        Text("\(item.quantity.amount, format: .number) \(item.quantity.unit.symbol)")
+                                            .font(.footnote)
+                                            .foregroundStyle(.secondary)
+                                            .lineLimit(1)
+                                    }
                                 }
+                                .padding(12.0)
+                                .background(.white, in: .containerRelative)
+                            }
+                            .buttonStyle(.plain)
+                            .listRowBackground(selectedItemIndex == index ? Color.blue : nil)
+                            .listRowInsets(EdgeInsets(2.0))
+
+                            // Discounts
+                            ForEach(item.discounts) { discount in
+                                LabeledContent(discount.name) {
+                                    Text(-item.priceOff(for: discount), format: .currency(code: form.currency.rawValue))
+                                        .foregroundStyle(.green)
+                                }
+                            }
+                        }
+                    }
+
+                    /*
+                     Section {
+                     NavigationLink("Ajouter un variant") {
+                     OrderProductVariantPicker(warehouse: warehouse, form: form, selectedVariants: $selectedVariants)
+                     }
+                     }
+                     */
+//                    Divider()
+
+                    Section {
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text("Client")
+                                    .font(.system(size: Constants.UI.sectionTitle, weight: .medium))
+                                    .foregroundStyle(Color(white: 0.20))
+
+                                Spacer()
+                            }
+                            .padding(.horizontal)
+
+                            /*
+                             Text("Sélectionner un client parmis votre porte client.")
+                             .font(.system(size: 16.0, weight: .regular, design: .rounded))
+                             .foregroundStyle(.gray)
+                             .background(.white, in: .rect(cornerRadius: 16.0))
+
+                             HStack(spacing: 12.0) {
+                             Button("Ajouter", systemImage: "plus") {}
+                             .buttonStyle(SecondaryButtonStyle())
+                             }
+                             */
+                            HStack(spacing: 16.0) {
+                                Circle()
+                                    .fill(Color(white: 0.95))
+                                    .frame(width: 50.0, height: 50.0)
+
+                                Text("OPAL Grand Lyon")
+                                    .font(.system(size: 16.0, weight: .medium, design: .rounded))
 
                                 Spacer()
 
-                                VStack(alignment: .trailing, spacing: 8.0) {
-                                    Text("\(item.subtotal, format: .currency(code: warehouse.currency.rawValue)) (HT)")
-                                        .lineLimit(1)
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 14.0, weight: .semibold))
+                                    .foregroundStyle(Color(white: 0.75))
+                            }
+                            .padding(16.0)
+                            .background(.white, in: .rect(cornerRadius: 24.0))
+                        }
+                    }
 
-                                    Text("\(item.quantity.amount, format: .number) \(item.quantity.unit.symbol)")
-                                        .font(.footnote)
-                                        .foregroundStyle(.secondary)
-                                        .lineLimit(1)
+                    Section {
+                        VStack(alignment: .leading) {
+                            HStack(alignment: .firstTextBaseline) {
+                                Text("Produit")
+                                    .font(.system(size: Constants.UI.sectionTitle, weight: .medium))
+                                    .foregroundStyle(Color(white: 0.20))
+
+                                Spacer()
+
+
+                                Image(systemName: "plus")
+                                    .foregroundStyle(.gray)
+                            }
+                            .padding(.horizontal)
+
+                            VStack(alignment: .leading, spacing: 16.0) {
+                                HStack(spacing: 16.0) {
+                                    Image("waterdrop_bottle_2")
+                                        .resizable()
+                                        .aspectRatio(1, contentMode: .fill)
+                                        .frame(width: 50.0, height: 50.0)
+                                        .clipShape(.containerRelative)
+
+                                    VStack(alignment: .leading, spacing: 4.0) {
+                                        Text("Analogue Pocket")
+                                            .font(.system(size: 16.0, weight: .medium, design: .rounded))
+
+                                        Text("AP-BLK")
+                                            .font(.system(size: 14.0, weight: .regular, design: .monospaced))
+                                            .foregroundStyle(.gray)
+                                    }
+
+                                    Spacer()
+
+                                    VStack(alignment: .trailing, spacing: 4.0) {
+                                        Text(239.99, format: .currency(code: "EUR"))
+                                            .font(.system(size: 16.0, weight: .medium, design: .rounded))
+
+                                        Text("1 pc")
+                                            .font(.system(size: 14.0, weight: .regular))
+                                            .foregroundStyle(.gray)
+                                    }
+
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 14.0, weight: .semibold))
+                                        .foregroundStyle(Color(white: 0.75))
+                                }
+
+                                Divider()
+
+                                HStack(spacing: 16.0) {
+                                    Image("waterdrop_bottle_1")
+                                        .resizable()
+                                        .aspectRatio(1, contentMode: .fill)
+                                        .frame(width: 50.0, height: 50.0)
+                                        .clipShape(.containerRelative)
+
+                                    VStack(alignment: .leading, spacing: 4.0) {
+                                        Text("Analogue Pocket")
+                                            .font(.system(size: 16.0, weight: .medium, design: .rounded))
+
+                                        Text("AP-BLK")
+                                            .font(.system(size: 14.0, weight: .regular, design: .monospaced))
+                                            .foregroundStyle(.gray)
+                                    }
+
+                                    Spacer()
+
+                                    VStack(alignment: .trailing, spacing: 4.0) {
+                                        Text(239.99, format: .currency(code: "EUR"))
+                                            .font(.system(size: 16.0, weight: .medium, design: .rounded))
+
+                                        Text("1 pc")
+                                            .font(.system(size: 14.0, weight: .regular))
+                                            .foregroundStyle(.gray)
+                                    }
+
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 14.0, weight: .semibold))
+                                        .foregroundStyle(Color(white: 0.75))
                                 }
                             }
-                            .padding(12.0)
-                            .background(.white, in: .containerRelative)
-                        }
-                        .buttonStyle(.plain)
-                        .listRowBackground(selectedItemIndex == index ? Color.blue : nil)
-                        .listRowInsets(EdgeInsets(2.0))
-
-                        // Discounts
-                        ForEach(item.discounts) { discount in
-                            LabeledContent(discount.name) {
-                                Text(-item.priceOff(for: discount), format: .currency(code: form.currency.rawValue))
-                                    .foregroundStyle(.green)
-                            }
+                            .padding(16.0)
+                            .background(.white, in: .rect(cornerRadius: 24.0))
                         }
                     }
-                }
 
-                /*
-                 Section {
-                 NavigationLink("Ajouter un variant") {
-                 OrderProductVariantPicker(warehouse: warehouse, form: form, selectedVariants: $selectedVariants)
-                 }
-                 }
-                 */
-                Divider()
-
-                Section {
-                    VStack(alignment: .leading, spacing: 24.0) {
-                        HStack {
-                            Label {
-                                Text("Client")
-                                    .font(.system(size: Constants.UI.sectionTitle, weight: .semibold))
-                                    .foregroundStyle(Color(white: 0.20))
-                            } icon: {
-                                Image(systemName: "person")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .foregroundStyle(.gray)
-                                    .frame(width: 18.0, height: 18.0)
-                            }
-
-                            Spacer()
-                        }
-
-                        Text("Sélectionner un client parmis votre porte client.")
-                            .font(.system(size: 16.0, weight: .regular, design: .rounded))
-                            .foregroundStyle(.gray)
-                            .background(.white, in: .rect(cornerRadius: 16.0))
-
-                        HStack(spacing: 12.0) {
-                            Button("Ajouter", systemImage: "plus") {}
-                                .buttonStyle(SecondaryButtonStyle())
-                        }
-                    }
-                }
-
-                Divider()
-                    .overlay(Color(white: 0.9))
-
-                Section {
-                    VStack(alignment: .leading, spacing: 24.0) {
-                        HStack(alignment: .firstTextBaseline) {
-                            Label {
-                                Text("Produit")
-                                    .font(.system(size: Constants.UI.sectionTitle, weight: .semibold))
-                                    .foregroundStyle(Color(white: 0.20))
-                            } icon: {
-                                Image(systemName: "tag")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .foregroundStyle(.gray)
-                                    .frame(width: 18.0, height: 18.0)
-                            }
-
-                            Spacer()
-
-
-                            Image(systemName: "ellipsis")
-                        }
-
-                        HStack(spacing: 16.0) {
-                            Image("waterdrop_bottle_2")
-                                .resizable()
-                                .aspectRatio(1, contentMode: .fill)
-                                .frame(width: 50.0, height: 50.0)
-                                .clipShape(.rect(cornerRadius: 8.0))
-
-                            VStack(alignment: .leading, spacing: 4.0) {
-                                Text("Analogue Pocket")
-                                    .font(.system(size: 16.0, weight: .medium, design: .rounded))
-
-                                Text("AP-BLK")
-                                    .font(.system(size: 14.0, weight: .regular, design: .monospaced))
-                                    .foregroundStyle(.gray)
-                            }
-
-                            Spacer()
-
-                            VStack(alignment: .trailing, spacing: 4.0) {
-                                Text(239.99, format: .currency(code: "EUR"))
-                                    .font(.system(size: 16.0, weight: .medium, design: .rounded))
-
-                                Text("1 pc")
-                                    .font(.system(size: 14.0, weight: .regular))
-                                    .foregroundStyle(.gray)
-                            }
-
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 14.0, weight: .semibold))
-                                .foregroundStyle(Color(white: 0.75))
-                        }
-
-                        HStack(spacing: 16.0) {
-                            Image("waterdrop_bottle_1")
-                                .resizable()
-                                .aspectRatio(1, contentMode: .fill)
-                                .frame(width: 50.0, height: 50.0)
-                                .clipShape(.rect(cornerRadius: 8.0))
-
-                            VStack(alignment: .leading, spacing: 4.0) {
-                                Text("Analogue Pocket")
-                                    .font(.system(size: 16.0, weight: .medium, design: .rounded))
-
-                                Text("AP-BLK")
-                                    .font(.system(size: 14.0, weight: .regular, design: .monospaced))
-                                    .foregroundStyle(.gray)
-                            }
-
-                            Spacer()
-
-                            VStack(alignment: .trailing, spacing: 4.0) {
-                                Text(239.99, format: .currency(code: "EUR"))
-                                    .font(.system(size: 16.0, weight: .medium, design: .rounded))
-
-                                Text("1 pc")
-                                    .font(.system(size: 14.0, weight: .regular))
-                                    .foregroundStyle(.gray)
-                            }
-
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 14.0, weight: .semibold))
-                                .foregroundStyle(Color(white: 0.75))
-                        }
-                    }
-                }
-
-                Divider()
-                    .overlay(Color(white: 0.9))
-
-                Section {
-                    VStack(alignment: .leading, spacing: 24.0) {
-                        HStack {
-                            Label {
+                    Section {
+                        VStack(alignment: .leading) {
+                            HStack {
                                 Text("Remises")
-                                    .font(.system(size: Constants.UI.sectionTitle, weight: .semibold))
+                                    .font(.system(size: Constants.UI.sectionTitle, weight: .medium))
                                     .foregroundStyle(Color(white: 0.20))
-                            } icon: {
-                                Image(systemName: "seal")
-                                    .resizable()
-                                    .scaledToFit()
+
+                                Spacer()
+
+                                Image(systemName: "plus")
                                     .foregroundStyle(.gray)
-                                    .frame(width: 18.0, height: 18.0)
                             }
+                            .padding(.horizontal)
 
-                            Spacer()
-                        }
+                            VStack(alignment: .leading, spacing: 16.0) {
+                                HStack(spacing: 16.0) {
+                                    Text("Winter")
+                                        .font(.system(size: 16.0))
+                                        .foregroundStyle(.gray)
 
-                        Text("Ajouter des remises sur votre produit. Lorem ispum dolor si amet.")
-                            .font(.system(size: 16.0, weight: .regular, design: .rounded))
-                            .foregroundStyle(.gray)
-                            .background(.white, in: .rect(cornerRadius: 16.0))
+                                    Text(23.0, format: .currency(code: "EUR"))
+                                        .font(.system(size: 16.0, weight: .medium))
+                                        .foregroundStyle(.black)
+                                        .frame(maxWidth: .infinity, alignment: .trailing)
 
-                        HStack(spacing: 12.0) {
-                            Button("Ajouter", systemImage: "plus") {}
-                                .buttonStyle(SecondaryButtonStyle())
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 14.0, weight: .semibold))
+                                        .foregroundStyle(Color(white: 0.75))
+                                }
+
+                                Divider()
+
+                                HStack(spacing: 16.0) {
+                                    Text("Welcome")
+                                        .font(.system(size: 16.0))
+                                        .foregroundStyle(.gray)
+
+                                    Text(0.056, format: .percent)
+                                        .font(.system(size: 16.0, weight: .medium))
+                                        .foregroundStyle(.black)
+                                        .frame(maxWidth: .infinity, alignment: .trailing)
+
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 14.0, weight: .semibold))
+                                        .foregroundStyle(Color(white: 0.75))
+                                }
+                            }
+                            .padding(16.0)
+                            .background(.white, in: .rect(cornerRadius: 24.0))
                         }
                     }
-                }
 
-                Divider()
-                    .overlay(Color(white: 0.9))
-
-                Section {
-                    VStack(alignment: .leading, spacing: 24.0) {
-                        HStack {
-                            Label {
+                    Section {
+                        VStack(alignment: .leading) {
+                            HStack {
                                 Text("Expédition")
-                                    .font(.system(size: Constants.UI.sectionTitle, weight: .semibold))
+                                    .font(.system(size: Constants.UI.sectionTitle, weight: .medium))
                                     .foregroundStyle(Color(white: 0.20))
-                            } icon: {
-                                Image(systemName: "shippingbox")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .foregroundStyle(.gray)
-                                    .frame(width: 18.0, height: 18.0)
+
+                                Spacer()
                             }
+                            .padding(.horizontal)
 
-                            Spacer()
-                        }
+                            VStack(alignment: .leading, spacing: 24.0) {
+                                HStack(spacing: 16.0) {
+                                    VStack(alignment: .leading, spacing: 4.0) {
+                                        Text("UPS")
+                                            .font(.system(size: 16.0, weight: .medium))
+                                            .foregroundStyle(Color(white: 0.25))
 
-                        HStack(spacing: 16.0) {
-                            VStack(alignment: .leading, spacing: 4.0) {
-                                Text("UPS")
-                                    .font(.system(size: 16.0, weight: .semibold))
-                                    .foregroundStyle(Color(white: 0.25))
+                                        Text("Livraison")
+                                            .font(.system(size: 16.0))
+                                            .foregroundStyle(.gray)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                    }
 
-                                Text("Livraison")
-                                    .font(.system(size: 16.0))
-                                    .foregroundStyle(.gray)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    Text(23.0, format: .currency(code: "EUR"))
+                                        .font(.system(size: 16.0, weight: .medium))
+                                        .frame(maxWidth: .infinity, alignment: .trailing)
+
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 14.0, weight: .semibold))
+                                        .foregroundStyle(Color(white: 0.75))
+                                }
                             }
-
-                            Text(23.0, format: .currency(code: "EUR"))
-                                .font(.system(size: 16.0, weight: .medium))
-                                .frame(maxWidth: .infinity, alignment: .trailing)
-
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 14.0, weight: .semibold))
-                                .foregroundStyle(Color(white: 0.75))
+                            .padding(16.0)
+                            .background(.white, in: .rect(cornerRadius: 24.0))
                         }
                     }
+
+//                    Divider()
+//                        .overlay(Color(white: 0.9))
+
+                    //            Section {
+                    //                if let shipping = form.shipping {
+                    //                    NavigationLink {
+                    //                        OrderCreateFormShippingView(form: form)
+                    //                    } label: {
+                    //                        VStack {
+                    //                            LabeledContent("Frais de livraison", value: shipping.cost, format: .currency(code: form.currency.rawValue))
+                    //
+                    //                            ForEach(shipping.taxes, id: \.name) { tax in
+                    //                                LabeledContent(tax.name, value: tax.rate, format: .percent)
+                    //                            }
+                    //                        }
+                    //                    }
+                    //                } else {
+                    //                    NavigationLink("Ajouter des frais de livraison") {
+                    //                        OrderCreateFormShippingView(form: form)
+                    //                    }
+                    //                }
+                    //            }
                 }
-
-                Divider()
-                    .overlay(Color(white: 0.9))
-
-                //            Section {
-                //                if let shipping = form.shipping {
-                //                    NavigationLink {
-                //                        OrderCreateFormShippingView(form: form)
-                //                    } label: {
-                //                        VStack {
-                //                            LabeledContent("Frais de livraison", value: shipping.cost, format: .currency(code: form.currency.rawValue))
-                //
-                //                            ForEach(shipping.taxes, id: \.name) { tax in
-                //                                LabeledContent(tax.name, value: tax.rate, format: .percent)
-                //                            }
-                //                        }
-                //                    }
-                //                } else {
-                //                    NavigationLink("Ajouter des frais de livraison") {
-                //                        OrderCreateFormShippingView(form: form)
-                //                    }
-                //                }
-                //            }
 
                 Section {
                     // Subtotal
-                    Grid(verticalSpacing: 24.0) {
+                    Grid(verticalSpacing: 16.0) {
                         GridRow {
                             Text("Sous-total")
                                 .font(.system(size: 16.0))
+                                .foregroundStyle(.gray)
                                 .frame(maxWidth: .infinity, alignment: .leading)
 
                             Text(form.subtotal, format: .currency(code: form.currency.rawValue))
                                 .font(.system(size: 16.0, weight: .medium))
-                                .foregroundStyle(.gray)
+                                .foregroundStyle(.black)
                                 .frame(maxWidth: .infinity, alignment: .trailing)
                         }
 
                         GridRow {
                             Text("Remise")
                                 .font(.system(size: 16.0))
+                                .foregroundStyle(.gray)
                                 .frame(maxWidth: .infinity, alignment: .leading)
 
                             Text(form.totalDiscount, format: .currency(code: form.currency.rawValue))
                                 .font(.system(size: 16.0, weight: .medium))
-                                .foregroundStyle(.indigo)
+                                .foregroundStyle(.black)
                                 .frame(maxWidth: .infinity, alignment: .trailing)
                         }
 
@@ -383,23 +407,26 @@ struct OrderCreateFormView: View {
                             GridRow {
                                 Text("Livraison")
                                     .font(.system(size: 16.0))
+                                    .foregroundStyle(.gray)
                                     .frame(maxWidth: .infinity, alignment: .leading)
 
                                 Text(shipping.cost, format: .currency(code: shipping.form?.currency.rawValue ?? ""))
                                     .font(.system(size: 16.0, weight: .medium))
-                                    .foregroundStyle(.indigo)
+                                    .foregroundStyle(.black)
                                     .frame(maxWidth: .infinity, alignment: .trailing)
                             }
                         }
 
+                        Divider()
+
                         GridRow {
                             Text("Total")
-                                .font(.system(size: 16.0, weight: .medium))
+                                .font(.system(size: 16.0, weight: .semibold))
                                 .frame(maxWidth: .infinity, alignment: .leading)
 
                             Text(form.total, format: .currency(code: warehouse.currency.rawValue))
-                                .font(.system(size: 16.0, weight: .medium))
-                                .foregroundStyle(.black)
+                                .font(.system(size: 16.0, weight: .semibold))
+                                .foregroundStyle(.indigo)
                                 .frame(maxWidth: .infinity, alignment: .trailing)
                         }
                     }
@@ -409,15 +436,11 @@ struct OrderCreateFormView: View {
                         LabeledContent("TVA (\(tax.rate, format: .percent))", value: amount, format: .currency(code: warehouse.currency.rawValue))
                     }
                 }
-
-                Button("Enregister") {}
-                    .buttonStyle(PrimaryButtonStyle())
-                    .padding(.top, 24.0)
+                .padding(.horizontal)
             }
-            .padding(24.0)
+            .padding(16.0)
         }
-//        .scrollContentBackground(.hidden)
-        .background(Color(white: 1))
+        .background(Color(white: 0.95))
         .safeAreaBar(edge: .bottom, spacing: 16.0) {
             if let selectedItemIndex {
 
